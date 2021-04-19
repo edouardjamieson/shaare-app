@@ -64,11 +64,11 @@ export default function Home() {
                     />
                         
                 </View>
-                {/* <PostModal
+                <PostModal
                     isOpen={modalVisible}
                     post={modalPost}
                     onClose={()=>{ setModalVisible(false); setModalPost(null); }}
-                /> */}
+                />
             </SafeAreaView>
         )
     }

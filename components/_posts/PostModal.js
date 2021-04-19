@@ -1,19 +1,57 @@
-import React,{ useState, useEffect } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, SafeAreaView, Linking } from 'react-native'
+import React,{ useState, useEffect, useRef } from 'react'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, SafeAreaView, Linking } from 'react-native'
 import { DefaultTheme } from '../../theme/default'
+import { Dimensions } from 'react-native';
+import { Easing } from 'react-native-reanimated';
 
 export default function PostModal({post, isOpen, onClose}) {
 
     if(!isOpen){
-        return ""
+        return null
     }
 
+    const viewAnim = useRef(new Animated.Value(0)).current
+    const boxAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current
+    const openAnimation = () => {
+        Animated.timing(viewAnim, {
+            toValue:1,
+            duration:100,
+            useNativeDriver: false
+        }).start()
+        Animated.timing(boxAnim, {
+            easing:Easing.bezier(0.83, 0, 0.17, 1),
+            toValue:Dimensions.get('window').height-350,
+            duration:300,
+            useNativeDriver: false
+        }).start()
+    }
+
+    const closeAnimation = () => {
+
+        Animated.timing(boxAnim, {
+            toValue:Dimensions.get('window').height,
+            duration:200,
+            useNativeDriver: false,
+            easing:Easing.bezier(0.83, 0, 0.17, 1),
+        }).start(({finished})=>{
+            if(finished){
+                Animated.timing(viewAnim, {
+                    toValue:0,
+                    duration:100,
+                    useNativeDriver: false
+                }).start(({finished})=>{ if(finished) onClose() })
+            }            
+        })
+    }
+
+
+    openAnimation()
     return(
-        <View style={[styles.modal_box, { display: isOpen ? "flex":"none" }]}>
+        <Animated.View style={[styles.modal_box, { display: isOpen ? "flex":"none", opacity:viewAnim }]}>
             <SafeAreaView style={styles.container}>
 
-                <TouchableOpacity style={styles.closer} onPress={()=>{ onClose() }}></TouchableOpacity>
-                <View style={styles.box}>
+                <TouchableOpacity style={styles.closer} onPress={()=>{ closeAnimation() }}></TouchableOpacity>
+                <Animated.View style={[styles.box, { top:boxAnim }]}>
                     <View style={styles.modal_head}>
                         <Image
                             source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}
@@ -23,9 +61,9 @@ export default function PostModal({post, isOpen, onClose}) {
                             <Text style={styles.modal_displayname}>edouardj😇</Text>
                             <Text style={styles.modal_username}>@edouardjamieson</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.modal_close_btn}>
+                        <TouchableOpacity style={styles.modal_close_btn} onPress={()=>{ closeAnimation() }}>
                             <Image
-                                source={require('./../../assets/images/icons/exit.svg')}
+                                source={require('./../../assets/images/icons/exit.png')}
                                 style={styles.modal_close_icon}
                             />
                         </TouchableOpacity>
@@ -42,7 +80,7 @@ export default function PostModal({post, isOpen, onClose}) {
                         <TouchableOpacity style={styles.modal_btn}>
                             <View style={styles.btn_container}>
                                 <Image
-                                    source={require('../../assets/images/icons/follow_user.svg')}
+                                    source={require('../../assets/images/icons/follow_user.png')}
                                     style={styles.btn_img}
                                 />
                             </View>
@@ -51,7 +89,7 @@ export default function PostModal({post, isOpen, onClose}) {
                         <TouchableOpacity style={styles.modal_btn}>
                             <View style={styles.btn_container}>
                                 <Image
-                                    source={require('../../assets/images/icons/bookmark.svg')}
+                                    source={require('../../assets/images/icons/bookmark.png')}
                                     style={styles.btn_img}
                                 />
                             </View>
@@ -60,7 +98,7 @@ export default function PostModal({post, isOpen, onClose}) {
                         <TouchableOpacity style={styles.modal_btn}>
                             <View style={styles.btn_container}>
                                 <Image
-                                    source={require('../../assets/images/icons/action_back.svg')}
+                                    source={require('../../assets/images/icons/action_back.png')}
                                     style={styles.btn_img}
                                 />
                             </View>
@@ -69,7 +107,7 @@ export default function PostModal({post, isOpen, onClose}) {
                         <TouchableOpacity style={styles.modal_btn}>
                             <View style={styles.btn_container}>
                                 <Image
-                                    source={require('../../assets/images/icons/alert.svg')}
+                                    source={require('../../assets/images/icons/alert.png')}
                                     style={styles.btn_img}
                                 />
                             </View>
@@ -77,10 +115,10 @@ export default function PostModal({post, isOpen, onClose}) {
                         </TouchableOpacity>
                         
                     </View>
-                </View>
+                </Animated.View>
 
             </SafeAreaView>
-        </View>
+        </Animated.View>
     )
 
 }
@@ -89,16 +127,17 @@ const styles = StyleSheet.create({
 
     modal_box:{
         width:"100%",
-        height:"100%",
+        height:Dimensions.get('window').height,
         flex:1,
         position:'absolute',
         backgroundColor:DefaultTheme.colors.darks.mid,
-        borderWidth:0
+        borderWidth:0,
     },
 
     container:{
         position:'relative',
-        flex:1
+        flex:1,
+        height:"100%"
     },
 
     closer:{
@@ -112,9 +151,8 @@ const styles = StyleSheet.create({
         borderRadius:35,
         backgroundColor:DefaultTheme.colors.dark,
         position:'absolute',
-        width:"calc(100% - 32px)",
+        width:Dimensions.get('window').width - 32,
         margin:16,
-        bottom:0,
         padding:16
     },
 
@@ -136,12 +174,12 @@ const styles = StyleSheet.create({
         justifyContent:'center'
     },
     modal_displayname:{
-        fontFamily:'quicksand-bold',
+        fontFamily:'Quicksand-bold',
         fontSize:DefaultTheme.fontSizes.medium,
         color:DefaultTheme.colors.whites.full,
     },
     modal_username:{
-        fontFamily:'quicksand-medium',
+        fontFamily:'Quicksand-medium',
         fontSize:DefaultTheme.fontSizes.small,
         color:DefaultTheme.colors.whites.tier,
     },

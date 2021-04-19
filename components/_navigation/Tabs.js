@@ -28,7 +28,7 @@ export default function Tabs() {
                 options={{
                     tabBarIcon: ({focused})=>{
                         return <Image
-                            source={require('../../assets/images/icons/home.svg')}
+                            source={require('../../assets/images/icons/home.png')}
                             style={[ styles.icon, {
                                 tintColor: focused ? DefaultTheme.colors.primary : "#fff"
                             }]}
@@ -42,7 +42,7 @@ export default function Tabs() {
                 options={{
                     tabBarIcon: ({focused})=>{
                         return <Image
-                            source={require('../../assets/images/icons/search.svg')}
+                            source={require('../../assets/images/icons/search.png')}
                             style={[ styles.icon, {
                                 tintColor: focused ? DefaultTheme.colors.primary : "#fff"
                             }]}
@@ -56,7 +56,7 @@ export default function Tabs() {
                 options={{
                     tabBarIcon: ({focused})=>{
                         return <Image
-                            source={require('../../assets/images/icons/trending.svg')}
+                            source={require('../../assets/images/icons/trending.png')}
                             style={[ styles.icon, {
                                 tintColor: focused ? DefaultTheme.colors.primary : "#fff"
                             }]}

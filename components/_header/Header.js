@@ -7,7 +7,7 @@ import {DefaultTheme} from './../../theme/default'
 export default function Header() {
     return (
         <View style={styles.header}>
-            <Image source={require('./../../assets/images/logo.svg')} style={styles.logo} />
+            <Image source={require('./../../assets/images/logo.png')} style={styles.logo} />
             <TouchableOpacity>
                 <LinearGradient
                     style={globalStyles.mainButton}

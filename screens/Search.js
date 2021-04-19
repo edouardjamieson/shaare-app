@@ -50,7 +50,7 @@ export default function Search() {
             <View style={globalStyles.page, {flex:1}}>
                 <Header/>
                 <View style={styles.search}>
-                    <Image source={require('./../assets/images/icons/search.svg')} style={styles.search_icon} />
+                    <Image source={require('./../assets/images/icons/search.png')} style={styles.search_icon} />
                     <TextInput
                         style={styles.input}
                         value={searchString}
