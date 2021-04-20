@@ -3,7 +3,7 @@ import React from 'react'
 import { useState } from 'react'
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native'
 
-export default function PostsCategoryList() {
+export default function PostsCategoryList({ onChange }) {
     const category = [
         {
             name:"For me",
@@ -36,9 +36,15 @@ export default function PostsCategoryList() {
     ]
     const [currentCategory, setCurrentCategory] = useState(0)
 
+    const returnCat = (item, index) => {
+        
+        onChange(item)
+        setCurrentCategory(index)
+    }
+
     const RenderCategoryItem = ({item, index}) => {
         return (
-            <TouchableOpacity style={index === currentCategory ? styles.activeItem : styles.item} onPress={()=>{ setCurrentCategory(index) }}>
+            <TouchableOpacity style={index === currentCategory ? styles.activeItem : styles.item} onPress={()=>{ returnCat(item, index) }}>
                 <Text style={index === currentCategory ? styles.activeItemText : styles.itemText}>{item.name}</Text>
             </TouchableOpacity>
         )
@@ -62,7 +68,7 @@ const styles = StyleSheet.create({
     list:{
         height:48,
         paddingLeft:16,
-        flexGrow:1,
+        flexGrow:0,
         flexShrink:0
     },
 
@@ -73,7 +79,7 @@ const styles = StyleSheet.create({
         paddingVertical:8
     },
     activeItemText: {
-        fontFamily:'quicksand-bold',
+        fontFamily:DefaultTheme.fonts.bold,
         color:DefaultTheme.colors.whites.full,
         fontSize:DefaultTheme.fontSizes.normal
     },
@@ -83,7 +89,7 @@ const styles = StyleSheet.create({
         paddingVertical:5
     },
     itemText: {
-        fontFamily:'quicksand-bold',
+        fontFamily:DefaultTheme.fonts.bold,
         color:DefaultTheme.colors.whites.mid,
         fontSize:DefaultTheme.fontSizes.normal
     }

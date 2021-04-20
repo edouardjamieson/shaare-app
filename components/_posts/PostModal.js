@@ -11,7 +11,7 @@ export default function PostModal({post, isOpen, onClose}) {
     }
 
     const viewAnim = useRef(new Animated.Value(0)).current
-    const boxAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current
+    const boxAnim = useRef(new Animated.Value(300)).current
     const openAnimation = () => {
         Animated.timing(viewAnim, {
             toValue:1,
@@ -20,7 +20,7 @@ export default function PostModal({post, isOpen, onClose}) {
         }).start()
         Animated.timing(boxAnim, {
             easing:Easing.bezier(0.83, 0, 0.17, 1),
-            toValue:Dimensions.get('window').height-350,
+            toValue:"0",
             duration:300,
             useNativeDriver: false
         }).start()
@@ -51,7 +51,7 @@ export default function PostModal({post, isOpen, onClose}) {
             <SafeAreaView style={styles.container}>
 
                 <TouchableOpacity style={styles.closer} onPress={()=>{ closeAnimation() }}></TouchableOpacity>
-                <Animated.View style={[styles.box, { top:boxAnim }]}>
+                <Animated.View style={[styles.box, { transform:[{translateY:boxAnim}] }]}>
                     <View style={styles.modal_head}>
                         <Image
                             source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}
@@ -127,11 +127,12 @@ const styles = StyleSheet.create({
 
     modal_box:{
         width:"100%",
-        height:Dimensions.get('window').height,
+        height:"100%",
         flex:1,
         position:'absolute',
         backgroundColor:DefaultTheme.colors.darks.mid,
         borderWidth:0,
+        zIndex:1000000
     },
 
     container:{
@@ -153,7 +154,8 @@ const styles = StyleSheet.create({
         position:'absolute',
         width:Dimensions.get('window').width - 32,
         margin:16,
-        padding:16
+        padding:16,
+        bottom:0
     },
 
 
@@ -174,12 +176,12 @@ const styles = StyleSheet.create({
         justifyContent:'center'
     },
     modal_displayname:{
-        fontFamily:'Quicksand-bold',
+        fontFamily:DefaultTheme.fonts.bold,
         fontSize:DefaultTheme.fontSizes.medium,
         color:DefaultTheme.colors.whites.full,
     },
     modal_username:{
-        fontFamily:'Quicksand-medium',
+        fontFamily:DefaultTheme.fonts.medium,
         fontSize:DefaultTheme.fontSizes.small,
         color:DefaultTheme.colors.whites.tier,
     },
@@ -205,14 +207,14 @@ const styles = StyleSheet.create({
         borderBottomWidth:1
     },
     body_title:{
-        fontFamily:'Quicksand-bold',
+        fontFamily:DefaultTheme.fonts.bold,
         fontSize:DefaultTheme.fontSizes.normal,
         color:DefaultTheme.colors.whites.full,
         marginBottom:8
     },
     body_link:{
         color:DefaultTheme.colors.primary,
-        fontFamily:'Quicksand-regular',
+        fontFamily:DefaultTheme.fonts.regular,
         fontSize:DefaultTheme.fontSizes.small,
         marginBottom:16
     },
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
     },
     btn_label:{
         fontSize:DefaultTheme.fontSizes.tiny,
-        fontFamily:'Quicksand-bold',
+        fontFamily:DefaultTheme.fonts.bold,
         color:DefaultTheme.colors.whites.mid
     }
 

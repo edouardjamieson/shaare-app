@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         borderRadius:100
     },
     content_profileName:{
-        fontFamily:'quicksand-bold',
+        fontFamily:DefaultTheme.fonts.bold,
         color:DefaultTheme.colors.whites.full,
         fontSize:DefaultTheme.fontSizes.normal,
         marginLeft:8
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     content_name:{
         width:"80%",
         color:DefaultTheme.colors.whites.full,
-        fontFamily:'quicksand-bold',
+        fontFamily:DefaultTheme.fonts.bold,
         fontSize:DefaultTheme.fontSizes.normal
     },
     content_img:{

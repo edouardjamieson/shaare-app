@@ -7,6 +7,7 @@ import {DefaultTheme} from './../../theme/default'
 import {globalStyles} from './../../assets/styles/global.style'
 import Home from '../../screens/Home'
 import Search from '../../screens/Search'
+import Trending from '../../screens/Trending'
 
 const Tab = createBottomTabNavigator()
 export default function Tabs() {
@@ -52,7 +53,7 @@ export default function Tabs() {
             />
             <Tab.Screen 
                 name="Trending"
-                component={Home}
+                component={Trending}
                 options={{
                     tabBarIcon: ({focused})=>{
                         return <Image

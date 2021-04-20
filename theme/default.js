@@ -3,6 +3,12 @@ export const DefaultTheme = {
     version:0.1,
     statusbar:'light-content',
     
+    fonts:{
+        regular:'Quicksand-regular',
+        medium:'Quicksand-medium',
+        bold:'Quicksand-bold'
+    },
+    
     fontSizes:{
         tiny:10,
         small:12,

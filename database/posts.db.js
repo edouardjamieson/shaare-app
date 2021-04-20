@@ -3,16 +3,24 @@ import {db} from './../firebase'
 // ====================================================================
 // GET POST LIST
 // ====================================================================
-async function getPosts(data) {
-
-    let equation = data.equation >= 1 ? data.equation : null
-    let category = data.category >= 1 ? data.category : null
-    //add user id so user doesnt see his posts
+async function getPosts({category, equation, userID}) {
 
     const col = db.collection('posts')
-    const doc = await col.get()
+    let doc
+    if(category && category != "none"){
+        doc = await col
+        .where("category", "==", category)
+        .get()
+
+    }else if(category === "none" || !category){
+        doc = await col.get()
+    }
+
+
     if(!doc.empty) {
         return doc.docs.map((doc)=>({id:doc.id, data:doc.data()}))
+    }else{
+        return 0
     }
 
 }

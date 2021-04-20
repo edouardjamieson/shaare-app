@@ -9,6 +9,7 @@ import {getPosts, getSinglePost} from './../database/posts.db'
 import PostModal from './../components/_posts/PostModal';
 import PostsCategoryList from './../components/_posts/PostsCategoryList'
 import SinglePost from './../components/_posts/SinglePost'
+import { DefaultTheme } from '../theme/default'
 
 export default function Home() {
 
@@ -16,9 +17,12 @@ export default function Home() {
     const [modalPost, setModalPost] = useState(null)
     const [posts, setPosts] = useState(null)
     
+    // ====================================================================
+    // Builds posts list after render
+    // ====================================================================
     useEffect(() => {
         if(!posts){
-            getPosts({equation:0, category:0})
+            getPosts({category:"none"})
             .then((docs)=>{
                 setPosts(
                     docs.map((doc)=>({ id:doc.id, data:doc.data }))
@@ -26,8 +30,43 @@ export default function Home() {
             }) 
         }
     }, [])
+
+    // ====================================================================
+    // Rebuilds posts list on demande
+    // ====================================================================
+    const buildList = ({ category, equation }) => {
+
+        setPosts(null)
+        
+        if(category === "none"){
+            //for me
+            getPosts({category:"none"})
+            .then((docs)=>{
+                setPosts(
+                    docs.map((doc)=>({ id:doc.id, data:doc.data }))
+                )
+            })
+
+
+        }else{
+            //category
+            getPosts({category:category})
+            .then((docs)=>{
+                if(docs === 0) return setPosts("empty")
+                setPosts(
+                    docs.map((doc)=>({ id:doc.id, data:doc.data }))
+                )
+            })
+
+        }
+
+
+    }
     
 
+    // ====================================================================
+    // Renders single post
+    // ====================================================================
     const renderPosts = ({item, index}) => {
         return(
             <SinglePost
@@ -37,24 +76,39 @@ export default function Home() {
         )
     }
 
-    if(!posts){
-        return (
-            <SafeAreaView style={globalStyles.safeArea}>
-                <View style={globalStyles.page}>
-                    <Header/>
-                    <Text style={{fontSize:50, color:"#fff"}}>Loading...</Text>
-                        
-                </View>
-            </SafeAreaView>
-        )
-    }else{
+    // ====================================================================
+    // No results view
+    // ====================================================================
+    const NoResults = () => {
         return(
-            <SafeAreaView style={globalStyles.safeArea}>
-                <View style={{flex:1}}>
-                    <Header/>
+            <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
+                <Text style={{ fontFamily:DefaultTheme.fonts.bold, color:DefaultTheme.colors.whites.full, fontSize:DefaultTheme.fontSizes.medium }}>Yikes! 😳</Text>
+                <Text style={{ fontFamily:DefaultTheme.fonts.medium, color:DefaultTheme.colors.whites.mid, fontSize:DefaultTheme.fontSizes.medium, paddingHorizontal:"20%", textAlign:'center' }}>Looks like there are no results for this.</Text>
+            </View>
+        )
+    }
+
+    // ====================================================================
+    // Loading view
+    // ====================================================================
+    const LoadingView = () => {
+        return(
+            <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
+                <Text style={{ fontFamily:DefaultTheme.fonts.bold, color:DefaultTheme.colors.whites.full, fontSize:DefaultTheme.fontSizes.medium }}>Yikes! 😳</Text>
+            </View>
+        )
+    }
+
+    return(
+        <SafeAreaView style={globalStyles.safeArea}>
+            <View style={{flex:1}}>
+                <Header/>
+                <PostsCategoryList onChange={ (cat)=>{ buildList({category:cat.set_to}) } }/>
+
+                {!posts ? <Text style={{fontSize:50, color:"red"}}>XD</Text> : null}
     
-                    <PostsCategoryList/>
-    
+                {posts === "empty" ?
+                    <NoResults/> :
                     <FlatList 
                         data={posts}
                         renderItem={renderPosts}
@@ -62,15 +116,16 @@ export default function Home() {
                         key={post => post.id}
                         showsVerticalScrollIndicator={false}
                     />
+                }
                         
-                </View>
-                <PostModal
-                    isOpen={modalVisible}
-                    post={modalPost}
-                    onClose={()=>{ setModalVisible(false); setModalPost(null); }}
-                />
-            </SafeAreaView>
-        )
-    }
+            </View>
+            <PostModal
+                isOpen={modalVisible}
+                post={modalPost}
+                onClose={()=>{ setModalVisible(false); setModalPost(null); }}
+            />
+        </SafeAreaView>
+    )
+    
 
 }

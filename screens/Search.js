@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
         width:"100%",
         fontSize:DefaultTheme.fontSizes.normal,
         borderWidth:0,
-        fontFamily:'quicksand-medium',
+        fontFamily:DefaultTheme.fonts.medium,
         color:DefaultTheme.colors.whites.full,
         paddingVertical:10,
         // outlineWidth:0
@@ -103,13 +103,13 @@ const styles = StyleSheet.create({
         justifyContent:'center',
     },
     empty_first:{
-        fontFamily:'quicksand-bold',
+        fontFamily:DefaultTheme.fonts.bold,
         fontSize:DefaultTheme.fontSizes.medium,
         color:DefaultTheme.colors.whites.full,
         marginBottom:8
     },
     empty_second:{
-        fontFamily:'quicksand-medium',
+        fontFamily:DefaultTheme.fonts.medium,
         fontSize:DefaultTheme.fontSizes.medium,
         color:DefaultTheme.colors.whites.mid
     }
