@@ -99,10 +99,13 @@ export default function Home() {
         )
     }
 
+    // ====================================================================
+    // Render
+    // ====================================================================
     return(
         <SafeAreaView style={globalStyles.safeArea}>
             <View style={{flex:1}}>
-                <Header/>
+                <Header isShaareButtonVisible={true}/>
                 <PostsCategoryList onChange={ (cat)=>{ buildList({category:cat.set_to}) } }/>
 
                 {!posts ? <Text style={{fontSize:50, color:"red"}}>XD</Text> : null}

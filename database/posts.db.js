@@ -42,7 +42,27 @@ async function getSinglePost(data) {
 
 }
 
+// ====================================================================
+// INSERT POST
+// ====================================================================
+async function insertPost(data) {
+
+    const post = {
+        author:data.author,
+        url:data.url,
+        category:data.category,
+        created_at:data.created_at,
+        keyword:data.keyword,
+        provider:data.provider,
+        reactions:[],
+        warnings:data.warnings
+    }
+
+    const query = await db.collection('posts').add(post)
+
+}
 
 
 
-export {getPosts, getSinglePost}
+
+export {getPosts, getSinglePost, insertPost}

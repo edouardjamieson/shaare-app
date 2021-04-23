@@ -22,8 +22,8 @@ export const DefaultTheme = {
         dark:"#07041B",
         primary:"#FE6944",
 
-        mainGradient:"linear-gradient(126.41deg, #FF6348 0%, #FA8231 100%)",
         mainGradientArray:["#FF6348", "#FA8231"],
+        errorGradientArray:["#E95252","#B72E2E"],
 
         whites:{
             full:"#fff",
