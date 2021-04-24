@@ -5,7 +5,9 @@ import { DefaultTheme } from '../theme/default'
 import { Easing } from 'react-native-reanimated';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {checkIfContainsBadwords} from './../badwords'
+
 import {insertPost} from './../database/posts.db'
+import {getProvider} from './../database/providers.db'
 
 export default function Shaare({isVisible, onPressX}) {
 
@@ -28,13 +30,13 @@ export default function Shaare({isVisible, onPressX}) {
 
     const validate = () => {
         setIsValidating(true)
+        const warnings = []
 
         const url_string = urlString.trim()
         const key_string = keyString.trim()
 
         //check if strings are empty
         if(url_string < 1 || key_string < 1){
-            //set error
             triggerError("Oups!", "One of the fields look empty.")
             setIsValidating(false)
             return
@@ -49,14 +51,20 @@ export default function Shaare({isVisible, onPressX}) {
         '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
 
         if(!pattern.test(url_string)){
-            //set error
             triggerError("Oups!", "That doesn't look like a URL.")
             setIsValidating(false)
             return
         }
+
+        //url is good so get infos
+        const URI = new URL(url_string)
+        let host = URI.hostname
+        host = host.replace(/^[^.]+\./g, "");
+        const protocol = URI.protocol
+        if(protocol === "http:") warnings.push("INSECURE_PROTOCOL")
+
         //check if url contains badwords
         if(checkIfContainsBadwords(url_string)){
-            //set error
             triggerError("Oups!", "We believe the URL contains unsuitable words.")
             setIsValidating(false)
             return
@@ -64,34 +72,41 @@ export default function Shaare({isVisible, onPressX}) {
 
         //check if keyword contains badwords
         if(checkIfContainsBadwords(key_string)){
-            //set error
             triggerError("Oups!", "We believe the keyword(s) contains unsuitable words.")
             setIsValidating(false)
             return
         }
 
-        const date = Date.now()
-        const data = {
-            author:"1",
-            url:url_string,
-            category:category[currentCategory].set_to,
-            created_at:date,
-            keyword:key_string,
-            provider:"youtube",
-            reactions:[],
-            warnings:[]
-        }
-        insertPost(data)
-        .then(res => {
-            setIsValidating(false)
-            closeAnim()
-        })
-        .catch(err => {
-            triggerError("Oups!", "There was an error. Please try again.")
-            setIsValidating(false)
-        })
+        //get provider
+        let provider = ""
+        getProvider(category[currentCategory].set_to, host).then(doc => {
+            if(doc != 0){
+                provider = doc.id
+            }
 
+            const date = Date.now()
+            const data = {
+                author:"1",
+                url:url_string,
+                category:category[currentCategory].set_to,
+                created_at:date,
+                keyword:key_string,
+                provider:provider,
+                reactions:[],
+                warnings:warnings
+            }
+            
+            insertPost(data)
+            .then(res => {
+                setIsValidating(false)
+                closeAnim()
+            })
+            .catch(err => {
+                triggerError("Oups!", "There was an error. Please try again.")
+                setIsValidating(false)
+            })
 
+        })
 
     }
 
@@ -193,7 +208,7 @@ export default function Shaare({isVisible, onPressX}) {
     return (
         <Animated.View style={[styles.shaare, { transform:[{translateY:toggleAnim}]}]}>
             <View style={[styles.loading, { display: isValidating ? "flex":"none" }]}>
-                <Text>loading...</Text>
+                <Image source={require('./../assets/images/loading.gif')} style={styles.loader}/>
             </View>
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding":"height"} style={{flex:1}} enabled={true} keyboardVerticalOffset={0}>
                 <ScrollView>
@@ -281,14 +296,20 @@ export default function Shaare({isVisible, onPressX}) {
 const styles = StyleSheet.create({
 
     loading:{
-        width:Dimensions.get('window').width,
+        width:"100%",
         height:Dimensions.get('window').height,
         flex:1,
-        // backgroundColor:DefaultTheme.colors.darks.mid,
         position:'absolute',
         zIndex:10,
         alignItems:'center',
-        justifyContent:'center'
+        justifyContent:'center',
+        left:0,
+    },
+    loader:{
+        width:48,
+        height:48,
+        resizeMode:'contain',
+        borderRadius:100
     },
 
     shaare:{

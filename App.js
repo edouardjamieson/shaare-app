@@ -10,8 +10,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import {globalStyles} from './assets/styles/global.style'
 import {DefaultTheme} from './theme/default'
 
+import {getLoggedUser} from './database/users.db'
+
 import Tabs from './components/_navigation/Tabs'
 import Home from './screens/Home'
+import Login from './screens/Login'
 
 const Stack = createStackNavigator()
 export default function App() {
@@ -22,6 +25,11 @@ export default function App() {
     'Quicksand-bold': require('./assets/fonts/Quicksand-Bold.ttf')
   })
 
+  const [user, setUser] = useState(null)
+  getLoggedUser().then((result) => {
+    setUser(result)
+  })
+
 
   if(!fontsLoaded){
     return(
@@ -29,30 +37,40 @@ export default function App() {
 
     )
   }else{
-    return (
-        <NavigationContainer theme={{
-          dark:true,
-          colors:{
-            background:DefaultTheme.colors.dark
-          },
-        }}>
-          <StatusBar
-            animated={true}
-            backgroundColor={DefaultTheme.colors.dark}
-            barStyle={DefaultTheme.statusbar}
-          />
 
-          <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home">
-            <Stack.Screen screenOptions={{gestureEnabled: false}} name="Home" component={Tabs} />
-            <Stack.Screen name="Search" component={Home} />
-            <Stack.Screen name="Trending" component={Home} />
-            <Stack.Screen name="Shaare" component={Home} />
-            <Stack.Screen name="Profile" component={Home} />
+    if(user === 0){
+      return (
+        <Login />
+      )
+    }else{
+      return (
+          <NavigationContainer theme={{
+            dark:true,
+            colors:{
+              background:DefaultTheme.colors.dark
+            },
+          }}>
+            <StatusBar
+              animated={true}
+              backgroundColor={DefaultTheme.colors.dark}
+              barStyle={DefaultTheme.statusbar}
+            />
+  
+            <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home">
+              <Stack.Screen screenOptions={{gestureEnabled: false}} name="Home" component={Tabs} />
+              <Stack.Screen name="Search" component={Home} />
+              <Stack.Screen name="Trending" component={Home} />
+              <Stack.Screen name="Shaare" component={Home} />
+              <Stack.Screen name="Profile" component={Home} />
+  
+            </Stack.Navigator>
+  
+          </NavigationContainer>
+      )
+    }
 
-          </Stack.Navigator>
 
-        </NavigationContainer>
-    )
+
     
   }
 }

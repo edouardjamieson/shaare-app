@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {Image, View, StyleSheet, TouchableOpacity, Text} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import {globalStyles} from './../../assets/styles/global.style'
