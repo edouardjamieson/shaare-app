@@ -10,7 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import {globalStyles} from './assets/styles/global.style'
 import {DefaultTheme} from './theme/default'
 
-import {getLoggedUser} from './database/users.db'
+import {checkIfUserIsLoggedIn} from './database/users.db'
 
 import Tabs from './components/_navigation/Tabs'
 import Home from './screens/Home'
@@ -26,21 +26,18 @@ export default function App() {
   })
 
   const [user, setUser] = useState(null)
-  getLoggedUser().then((result) => {
-    setUser(result)
-  })
+  checkIfUserIsLoggedIn().then((val) => setUser(val))
 
 
   if(!fontsLoaded){
     return(
       <Text style={{color:"red", fontSize:32}}>Yo</Text>
-
     )
   }else{
 
     if(user === 0){
       return (
-        <Login />
+        <Login onLogin={ (data) => { setUser(data) } } />
       )
     }else{
       return (

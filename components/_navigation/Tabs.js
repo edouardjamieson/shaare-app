@@ -5,10 +5,12 @@ import {createBottomTabNavigator, BottomTabBar} from '@react-navigation/bottom-t
 
 import {DefaultTheme} from './../../theme/default'
 import {globalStyles} from './../../assets/styles/global.style'
+
 import Home from '../../screens/Home'
 import Search from '../../screens/Search'
 import Trending from '../../screens/Trending'
-
+import Profile from '../../screens/Profile'
+ 
 const Tab = createBottomTabNavigator()
 export default function Tabs() {
     return(
@@ -67,7 +69,7 @@ export default function Tabs() {
             />
             <Tab.Screen 
                 name="Profile"
-                component={Home}
+                component={Profile}
                 options={{
                     tabBarIcon: ({focused})=>{
                         return <Image

@@ -13,7 +13,10 @@ export default function SinglePost({post, longPress}) {
         longPress()
     }
 
-    
+    // ====================================================================
+    // Get author
+    // ====================================================================
+    // const author
     
 
     return (
@@ -31,7 +34,7 @@ export default function SinglePost({post, longPress}) {
                                     source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}
                                     style={styles.content_profileImg}
                                 />
-                                <Text style={styles.content_profileName}>Eddy</Text>
+                                <Text style={styles.content_profileName}>{post.data.author}</Text>
                             </View>
                         </TouchableOpacity>
                         {/* footer */}
@@ -50,6 +53,9 @@ export default function SinglePost({post, longPress}) {
             </LinearGradient>
 
             <View style={styles.reactions}>
+                {
+                    p
+                }
                 <TouchableOpacity style={styles.reaction}>
                     <Text style={styles.reaction_icon}>🦑</Text>
                 </TouchableOpacity>

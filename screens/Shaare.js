@@ -8,6 +8,7 @@ import {checkIfContainsBadwords} from './../badwords'
 
 import {insertPost} from './../database/posts.db'
 import {getProvider} from './../database/providers.db'
+import {getCachedUser} from './../database/users.db'
 
 export default function Shaare({isVisible, onPressX}) {
 
@@ -84,27 +85,32 @@ export default function Shaare({isVisible, onPressX}) {
                 provider = doc.id
             }
 
-            const date = Date.now()
-            const data = {
-                author:"1",
-                url:url_string,
-                category:category[currentCategory].set_to,
-                created_at:date,
-                keyword:key_string,
-                provider:provider,
-                reactions:[],
-                warnings:warnings
-            }
-            
-            insertPost(data)
-            .then(res => {
-                setIsValidating(false)
-                closeAnim()
-            })
-            .catch(err => {
-                triggerError("Oups!", "There was an error. Please try again.")
-                setIsValidating(false)
-            })
+            getCachedUser().then(result => {
+
+                const date = Date.now()
+                const data = {
+                    author:result.id,
+                    url:url_string,
+                    category:category[currentCategory].set_to,
+                    created_at:date,
+                    keyword:key_string,
+                    provider:provider,
+                    reactions:[],
+                    warnings:warnings
+                }
+                
+                insertPost(data)
+                .then(res => {
+                    setIsValidating(false)
+                    closeAnim()
+                })
+                .catch(err => {
+                    triggerError("Oups!", "There was an error. Please try again.")
+                    setIsValidating(false)
+                })
+
+            })            
+
 
         })
 

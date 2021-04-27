@@ -8,12 +8,14 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.13.0",
     "@react-native-clipboard/clipboard": "^1.7.0",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.9",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.4",
     "bootstrap-icons": "^1.4.1",
+    "crypto-js": "^4.0.0",
     "expo": "^41.0.0",
     "expo-app-loading": "^1.0.1",
     "expo-font": "~9.1.0",
@@ -31,8 +33,7 @@
     "react-native-web": "~0.13.12",
     "react-navigation": "^4.4.4",
     "react-navigation-stack": "^2.10.4",
-    "remove": "^0.1.5",
-    "@react-native-async-storage/async-storage": "^1.13.0"
+    "remove": "^0.1.5"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"

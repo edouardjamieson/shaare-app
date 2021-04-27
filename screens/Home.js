@@ -5,6 +5,7 @@ import {globalStyles} from '../assets/styles/global.style'
 
 import {db} from './../firebase'
 import {getPosts, getSinglePost} from './../database/posts.db'
+import {getCachedUser} from './../database/users.db'
 
 import PostModal from './../components/_posts/PostModal';
 import PostsCategoryList from './../components/_posts/PostsCategoryList'
@@ -29,6 +30,8 @@ export default function Home() {
                 )
             }) 
         }
+
+        getCachedUser().then(val => {console.log(val)})
     }, [])
 
     // ====================================================================
