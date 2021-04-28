@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {Text, View, SafeAreaView, FlatList, Alert} from 'react-native'
+import {Text, View, SafeAreaView, FlatList, Alert, Modal} from 'react-native'
 import Header from './../components/_header/Header'
 import {globalStyles} from '../assets/styles/global.style'
 
@@ -12,7 +12,7 @@ import PostsCategoryList from './../components/_posts/PostsCategoryList'
 import SinglePost from './../components/_posts/SinglePost'
 import { DefaultTheme } from '../theme/default'
 
-export default function Home() {
+export default function Home({navigation}) {
 
     const [modalVisible, setModalVisible] = useState(false)
     const [modalPost, setModalPost] = useState(null)
@@ -74,7 +74,7 @@ export default function Home() {
         return(
             <SinglePost
                 post={item}
-                longPress={()=>{ setModalPost(item); setModalVisible(true); }}
+                onTap={()=>{ setModalPost(item); setModalVisible(true); }}
             />
         )
     }
@@ -108,7 +108,7 @@ export default function Home() {
     return(
         <SafeAreaView style={globalStyles.safeArea}>
             <View style={{flex:1}}>
-                <Header isShaareButtonVisible={true}/>
+                <Header isShaareButtonVisible={true} onPressShaare={()=>{ navigation.navigate('Shaare') }}/>
                 <PostsCategoryList onChange={ (cat)=>{ buildList({category:cat.set_to}) } }/>
 
                 {!posts ? <Text style={{fontSize:50, color:"red"}}>XD</Text> : null}

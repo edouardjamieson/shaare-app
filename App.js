@@ -15,6 +15,7 @@ import {checkIfUserIsLoggedIn} from './database/users.db'
 import Tabs from './components/_navigation/Tabs'
 import Home from './screens/Home'
 import Login from './screens/Login'
+import Shaare from './screens/Shaare'
 
 const Stack = createStackNavigator()
 export default function App() {
@@ -53,13 +54,9 @@ export default function App() {
               barStyle={DefaultTheme.statusbar}
             />
   
-            <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home">
+            <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home" mode="modal">
               <Stack.Screen screenOptions={{gestureEnabled: false}} name="Home" component={Tabs} />
-              <Stack.Screen name="Search" component={Home} />
-              <Stack.Screen name="Trending" component={Home} />
-              <Stack.Screen name="Shaare" component={Home} />
-              <Stack.Screen name="Profile" component={Home} />
-  
+              <Stack.Screen name="Shaare" component={Shaare}/>
             </Stack.Navigator>
   
           </NavigationContainer>

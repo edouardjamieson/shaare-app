@@ -5,17 +5,15 @@ import {globalStyles} from './../../assets/styles/global.style'
 import {DefaultTheme} from './../../theme/default'
 import Shaare from '../../screens/Shaare';
 
-export default function Header({isShaareButtonVisible}) {
+export default function Header({isShaareButtonVisible, onPressShaare}) {
 
     const [isShaareVisible, setShaareVisible] = useState(false)
 
     return (
-        <>
-        <Shaare isVisible={isShaareVisible} onPressX={()=>{ setShaareVisible(false) }} />
         <View style={styles.header}>
             <Image source={require('./../../assets/images/logo.png')} style={styles.logo} />
             {isShaareButtonVisible === true ?
-            <TouchableOpacity onPress={()=>{ setShaareVisible(true) }} style={styles.button}>
+            <TouchableOpacity onPress={()=>{ onPressShaare() }} style={styles.button}>
                 <LinearGradient
                     style={styles.gradient}
                     colors={DefaultTheme.colors.mainGradientArray}
@@ -25,7 +23,6 @@ export default function Header({isShaareButtonVisible}) {
             </TouchableOpacity>
             : null}
         </View>
-        </>
     )
 }
 const styles = StyleSheet.create({

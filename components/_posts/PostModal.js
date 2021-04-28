@@ -1,5 +1,5 @@
 import React,{ useState, useEffect, useRef } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, SafeAreaView, Linking } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, SafeAreaView, Linking, Modal } from 'react-native'
 import { DefaultTheme } from '../../theme/default'
 import { Dimensions } from 'react-native';
 import { Easing } from 'react-native-reanimated';
@@ -47,78 +47,91 @@ export default function PostModal({post, isOpen, onClose}) {
 
     openAnimation()
     return(
-        <Animated.View style={[styles.modal_box, { display: isOpen ? "flex":"none", opacity:viewAnim }]}>
-            <SafeAreaView style={styles.container}>
+        <Modal
+            visible={isOpen}
+            animationType="slide"
+        >
+            <SafeAreaView>
 
-                <TouchableOpacity style={styles.closer} onPress={()=>{ closeAnimation() }}></TouchableOpacity>
-                <Animated.View style={[styles.box, { transform:[{translateY:boxAnim}] }]}>
-                    <View style={styles.modal_head}>
-                        <Image
-                            source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}
-                            style={styles.modal_user_pic}
-                        />
-                        <TouchableOpacity style={styles.modal_usernames}>
-                            <Text style={styles.modal_displayname}>edouardj😇</Text>
-                            <Text style={styles.modal_username}>@edouardjamieson</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.modal_close_btn} onPress={()=>{ closeAnimation() }}>
-                            <Image
-                                source={require('./../../assets/images/icons/exit.png')}
-                                style={styles.modal_close_icon}
-                            />
-                        </TouchableOpacity>
-
-                    </View>
-                    <View style={styles.modal_body}>
-                        <Text style={styles.body_title}>Travis Scott - yo xd mamadou</Text>
-                        <TouchableOpacity onPress={()=>Linking.openURL(post.data.url)}>
-                            <Text style={styles.body_link}>{post.data.url}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.modal_buttons}>
-
-                        <TouchableOpacity style={styles.modal_btn}>
-                            <View style={styles.btn_container}>
-                                <Image
-                                    source={require('../../assets/images/icons/follow_user.png')}
-                                    style={styles.btn_img}
-                                />
-                            </View>
-                            <Text style={styles.btn_label}>Follow user</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.modal_btn}>
-                            <View style={styles.btn_container}>
-                                <Image
-                                    source={require('../../assets/images/icons/bookmark.png')}
-                                    style={styles.btn_img}
-                                />
-                            </View>
-                            <Text style={styles.btn_label}>Bookmark</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.modal_btn}>
-                            <View style={styles.btn_container}>
-                                <Image
-                                    source={require('../../assets/images/icons/action_back.png')}
-                                    style={styles.btn_img}
-                                />
-                            </View>
-                            <Text style={styles.btn_label}>Shaare back</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.modal_btn}>
-                            <View style={styles.btn_container}>
-                                <Image
-                                    source={require('../../assets/images/icons/alert.png')}
-                                    style={styles.btn_img}
-                                />
-                            </View>
-                            <Text style={styles.btn_label}>Report post</Text>
-                        </TouchableOpacity>
-                        
-                    </View>
-                </Animated.View>
-
+                <TouchableOpacity onPress={()=>{ onClose() }}>
+                    <Text>Close</Text>
+                </TouchableOpacity>
             </SafeAreaView>
-        </Animated.View>
+
+
+        </Modal>
+        // <Animated.View style={[styles.modal_box, { display: isOpen ? "flex":"none", opacity:viewAnim }]}>
+        //     <SafeAreaView style={styles.container}>
+
+        //         <TouchableOpacity style={styles.closer} onPress={()=>{ closeAnimation() }}></TouchableOpacity>
+        //         <Animated.View style={[styles.box, { transform:[{translateY:boxAnim}] }]}>
+        //             <View style={styles.modal_head}>
+        //                 <Image
+        //                     source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}
+        //                     style={styles.modal_user_pic}
+        //                 />
+        //                 <TouchableOpacity style={styles.modal_usernames}>
+        //                     <Text style={styles.modal_displayname}>edouardj😇</Text>
+        //                     <Text style={styles.modal_username}>@edouardjamieson</Text>
+        //                 </TouchableOpacity>
+        //                 <TouchableOpacity style={styles.modal_close_btn} onPress={()=>{ closeAnimation() }}>
+        //                     <Image
+        //                         source={require('./../../assets/images/icons/exit.png')}
+        //                         style={styles.modal_close_icon}
+        //                     />
+        //                 </TouchableOpacity>
+
+        //             </View>
+        //             <View style={styles.modal_body}>
+        //                 <Text style={styles.body_title}>Travis Scott - yo xd mamadou</Text>
+        //                 <TouchableOpacity onPress={()=>Linking.openURL(post.data.url)}>
+        //                     <Text style={styles.body_link}>{post.data.url}</Text>
+        //                 </TouchableOpacity>
+        //             </View>
+        //             <View style={styles.modal_buttons}>
+
+        //                 <TouchableOpacity style={styles.modal_btn}>
+        //                     <View style={styles.btn_container}>
+        //                         <Image
+        //                             source={require('../../assets/images/icons/follow_user.png')}
+        //                             style={styles.btn_img}
+        //                         />
+        //                     </View>
+        //                     <Text style={styles.btn_label}>Follow user</Text>
+        //                 </TouchableOpacity>
+        //                 <TouchableOpacity style={styles.modal_btn}>
+        //                     <View style={styles.btn_container}>
+        //                         <Image
+        //                             source={require('../../assets/images/icons/bookmark.png')}
+        //                             style={styles.btn_img}
+        //                         />
+        //                     </View>
+        //                     <Text style={styles.btn_label}>Bookmark</Text>
+        //                 </TouchableOpacity>
+        //                 <TouchableOpacity style={styles.modal_btn}>
+        //                     <View style={styles.btn_container}>
+        //                         <Image
+        //                             source={require('../../assets/images/icons/action_back.png')}
+        //                             style={styles.btn_img}
+        //                         />
+        //                     </View>
+        //                     <Text style={styles.btn_label}>Shaare back</Text>
+        //                 </TouchableOpacity>
+        //                 <TouchableOpacity style={styles.modal_btn}>
+        //                     <View style={styles.btn_container}>
+        //                         <Image
+        //                             source={require('../../assets/images/icons/alert.png')}
+        //                             style={styles.btn_img}
+        //                         />
+        //                     </View>
+        //                     <Text style={styles.btn_label}>Report post</Text>
+        //                 </TouchableOpacity>
+                        
+        //             </View>
+        //         </Animated.View>
+
+        //     </SafeAreaView>
+        // </Animated.View>
     )
 
 }

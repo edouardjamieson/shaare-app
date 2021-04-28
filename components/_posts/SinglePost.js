@@ -5,18 +5,12 @@ import { DefaultTheme } from '../../theme/default'
 
 import PostModal from './PostModal'
 
-export default function SinglePost({post, longPress}) {
-
-    const [LongPressStyle, setLongPressStyle] = useState(false)
-
-    const handleLongPress = () => {
-        longPress()
-    }
+export default function SinglePost({post, onTap}) {
 
     // ====================================================================
     // Get author
     // ====================================================================
-    // const author
+    // const author = 
     
 
     return (
@@ -24,7 +18,7 @@ export default function SinglePost({post, longPress}) {
 {/* { transform: LongPressStyle ? [{scale:0.8}] : "none" } */}
             <LinearGradient style={styles.post} colors={DefaultTheme.colors.mainGradientArray}>
                 <View style={styles.ratio}></View>
-                <TouchableWithoutFeedback onPress={()=>{alert("goto link")}} onLongPress={()=>{ handleLongPress() }}>
+                <TouchableWithoutFeedback onPress={()=>{ onTap() }} onLongPress={()=> { alert("go to link") }}>
                     <View style={styles.content}>
                         
                         {/* header */}
@@ -53,9 +47,6 @@ export default function SinglePost({post, longPress}) {
             </LinearGradient>
 
             <View style={styles.reactions}>
-                {
-                    p
-                }
                 <TouchableOpacity style={styles.reaction}>
                     <Text style={styles.reaction_icon}>🦑</Text>
                 </TouchableOpacity>

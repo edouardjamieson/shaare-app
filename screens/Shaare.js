@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import React, {useState, useRef, useEffect} from 'react'
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Animated, TextInput, Dimensions, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Animated, TextInput, Dimensions, KeyboardAvoidingView, ScrollView, Platform, SafeAreaView } from 'react-native'
 import { DefaultTheme } from '../theme/default'
 import { Easing } from 'react-native-reanimated';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -10,11 +10,7 @@ import {insertPost} from './../database/posts.db'
 import {getProvider} from './../database/providers.db'
 import {getCachedUser} from './../database/users.db'
 
-export default function Shaare({isVisible, onPressX}) {
-
-    if(!isVisible){
-        return null
-    }
+export default function Shaare({navigation}) {
 
     // ====================================================================
     // Validate
@@ -102,7 +98,7 @@ export default function Shaare({isVisible, onPressX}) {
                 insertPost(data)
                 .then(res => {
                     setIsValidating(false)
-                    closeAnim()
+                    navigation.navigate('Home')
                 })
                 .catch(err => {
                     triggerError("Oups!", "There was an error. Please try again.")
@@ -121,29 +117,6 @@ export default function Shaare({isVisible, onPressX}) {
     // ====================================================================
     const [urlString, setUrlString] = useState("")
     const [keyString, setKeyString] = useState("")
-
-    // ====================================================================
-    // Animations
-    // ====================================================================
-    const toggleAnim = useRef(new Animated.Value(Dimensions.get("window").height)).current
-    const openAnim = () => {
-        Animated.timing(toggleAnim, {
-            toValue:0,
-            duration:500,
-            useNativeDriver: false,
-            easing:Easing.bezier(0.83, 0, 0.17, 1),
-        }).start()
-    }
-    const closeAnim = () => {
-        Animated.timing(toggleAnim, {
-            toValue:Dimensions.get("window").height,
-            duration:300,
-            useNativeDriver: false,
-            easing:Easing.bezier(0.83, 0, 0.17, 1),
-        }).start(({finished})=>{
-            if(finished) onPressX()
-        })
-    }
 
     // ====================================================================
     // Clipboard
@@ -210,20 +183,22 @@ export default function Shaare({isVisible, onPressX}) {
 
     }
     
-    openAnim()
     return (
-        <Animated.View style={[styles.shaare, { transform:[{translateY:toggleAnim}]}]}>
+        <View style={[styles.shaare]}>
             <View style={[styles.loading, { display: isValidating ? "flex":"none" }]}>
                 <Image source={require('./../assets/images/loading.gif')} style={styles.loader}/>
             </View>
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding":"height"} style={{flex:1}} enabled={true} keyboardVerticalOffset={0}>
                 <ScrollView>
-                    <View style={styles.header}>
-                        <Text style={styles.header_text}>Shaare somethin' {words[currentWord]}</Text>
-                        <TouchableOpacity style={styles.shaare_close} onPress={()=>{ closeAnim() }}>
-                            <Image source={require('./../assets/images/icons/exit.png')} style={styles.shaare_close_icon} />
-                        </TouchableOpacity>
-                    </View>
+                    <SafeAreaView>
+                    
+                        <View style={styles.header}>
+                            <Text style={styles.header_text}>Shaare somethin' {words[currentWord]}</Text>
+                            <TouchableOpacity style={styles.shaare_close} onPress={()=>{ navigation.navigate('Home') }}>
+                                <Image source={require('./../assets/images/icons/exit.png')} style={styles.shaare_close_icon} />
+                            </TouchableOpacity>
+                        </View>
+                    </SafeAreaView>
 
                     <Text style={styles.label}>Category</Text>
                     <FlatList
@@ -295,7 +270,7 @@ export default function Shaare({isVisible, onPressX}) {
             </KeyboardAvoidingView>
             
 
-        </Animated.View>
+        </View>
     )
 }
 
