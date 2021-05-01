@@ -7,7 +7,6 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {checkIfContainsBadwords} from './../badwords'
 
 import {insertPost} from './../database/posts.db'
-import {getProvider} from './../database/providers.db'
 import {getCachedUser} from './../database/users.db'
 
 export default function Shaare({navigation}) {
@@ -56,7 +55,9 @@ export default function Shaare({navigation}) {
         //url is good so get infos
         const URI = new URL(url_string)
         let host = URI.hostname
-        host = host.replace(/^[^.]+\./g, "");
+        if(host.split(".").length > 2){
+            host = host.replace(/^[^.]+\./g, "");
+        }
         const protocol = URI.protocol
         if(protocol === "http:") warnings.push("INSECURE_PROTOCOL")
 
@@ -73,42 +74,31 @@ export default function Shaare({navigation}) {
             setIsValidating(false)
             return
         }
+        getCachedUser().then(result => {
 
-        //get provider
-        let provider = ""
-        getProvider(category[currentCategory].set_to, host).then(doc => {
-            if(doc != 0){
-                provider = doc.id
+            const date = Date.now()
+            const data = {
+                author:result.id,
+                url:url_string,
+                category:category[currentCategory].set_to,
+                created_at:date,
+                keyword:key_string,
+                reactions:[],
+                warnings:warnings
             }
+            
+            insertPost(data)
+            .then(res => {
+                setIsValidating(false)
+                navigation.navigate('Home')
+            })
+            .catch(err => {
+                triggerError("Oups!", "There was an error. Please try again.")
+                console.log(err);
+                setIsValidating(false)
+            })
 
-            getCachedUser().then(result => {
-
-                const date = Date.now()
-                const data = {
-                    author:result.id,
-                    url:url_string,
-                    category:category[currentCategory].set_to,
-                    created_at:date,
-                    keyword:key_string,
-                    provider:provider,
-                    reactions:[],
-                    warnings:warnings
-                }
-                
-                insertPost(data)
-                .then(res => {
-                    setIsValidating(false)
-                    navigation.navigate('Home')
-                })
-                .catch(err => {
-                    triggerError("Oups!", "There was an error. Please try again.")
-                    setIsValidating(false)
-                })
-
-            })            
-
-
-        })
+        })            
 
     }
 
@@ -117,14 +107,6 @@ export default function Shaare({navigation}) {
     // ====================================================================
     const [urlString, setUrlString] = useState("")
     const [keyString, setKeyString] = useState("")
-
-    // ====================================================================
-    // Clipboard
-    // ====================================================================
-    const setUrlByClipboard = async () => {
-        const text = await Clipboard.getString()
-        setUrlString(text)
-    }
     
     // ====================================================================
     // Get random greetings text

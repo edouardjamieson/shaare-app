@@ -79,6 +79,15 @@ async function updateCachedUser(userID) {
 // ====================================================================
 
 // ====================================================================
+// GET USER BY ID
+// ====================================================================
+async function getUserById(id) {
+    const user = await db.collection('users').doc(id).get()
+    if(user.empty) return 0
+    return user.data()
+}
+
+// ====================================================================
 // LOG OUT USER
 // ====================================================================
 
@@ -125,7 +134,8 @@ async function insertUser(data) {
         region:region,
         role:"user",
         equation:"",
-        profilePicture:""
+        profilePicture:"https://firebasestorage.googleapis.com/v0/b/shaare-6f9db.appspot.com/o/profile_pictures%2Fdefault.png?alt=media&token=f5cc1035-48e9-4b53-af21-f1dbfe83b5a0",
+        saved:[]
     }
 
     const query = await db.collection('users').add(user)
@@ -137,6 +147,7 @@ export {
     checkIfUserIsLoggedIn,
     getCachedUser,
     updateCachedUser,
+    getUserById,
     logOutUser,
     insertUser,
 }

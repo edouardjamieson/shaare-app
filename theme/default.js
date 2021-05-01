@@ -32,7 +32,8 @@ export const DefaultTheme = {
             quin:"rgba(255,255,255,0.15)",
         },
         darks:{
-            mid:"rgba(0,0,0,0.5)"
+            mid:"rgba(7, 4, 27, 0.5)",
+            quad:"rgba(7, 4, 27, 0.75)"
         }
     }
 }

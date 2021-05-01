@@ -1,80 +1,76 @@
 import React,{ useState, useEffect } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback, Dimensions, ImageBackground, Linking } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { DefaultTheme } from '../../theme/default'
 
 import PostModal from './PostModal'
+import {getUserById} from './../../database/users.db'
 
-export default function SinglePost({post, onTap}) {
+export default function SinglePost({post, onTap, onTapProfile}) {
 
     // ====================================================================
     // Get author
     // ====================================================================
-    // const author = 
+    const [author, setAuthor] = useState(null)
+    getUserById(post.data.author).then((result)=> {
+        setAuthor(result)
+    })
+    .catch(err=> console.log(err))
+
+    // ====================================================================
+    // Loader
+    // ====================================================================
+    const [isLoading, setIsLoading] = useState(true)
+    useEffect(() => {
+        
+        // console.log("test");
+        // setIsLoading(false)
+        console.log(author);
+
+    }, [author])
     
 
-    return (
-        <View style={styles.container}>
-{/* { transform: LongPressStyle ? [{scale:0.8}] : "none" } */}
-            <LinearGradient style={styles.post} colors={DefaultTheme.colors.mainGradientArray}>
+    if(isLoading){
+        return (
+            <LinearGradient colors={DefaultTheme.colors.mainGradientArray} style={styles.post}>
                 <View style={styles.ratio}></View>
-                <TouchableWithoutFeedback onPress={()=>{ onTap() }} onLongPress={()=> { alert("go to link") }}>
-                    <View style={styles.content}>
-                        
-                        {/* header */}
-                        <TouchableOpacity style={styles.content_headerBtn} onPress={()=>{alert("goto profile")}}>
-                            <View style={styles.content_header}>
-                                <Image
-                                    source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}
-                                    style={styles.content_profileImg}
-                                />
-                                <Text style={styles.content_profileName}>{post.data.author}</Text>
-                            </View>
-                        </TouchableOpacity>
-                        {/* footer */}
-                        <View style={styles.content_footer}>
-                            <Text style={styles.content_name}>
-                                SuicideBoys -xd -xd-xd
-                            </Text>
-                            <Image
-                            source={{uri:"https://www.freepnglogos.com/uploads/spotify-logo-png/spotify-logo-transparent-spotify-logo-images-25.png"}}
-                            style={styles.content_img}
-                            />
-                        </View>
-
-                    </View>
-                </TouchableWithoutFeedback>
             </LinearGradient>
-
-            <View style={styles.reactions}>
-                <TouchableOpacity style={styles.reaction}>
-                    <Text style={styles.reaction_icon}>🦑</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.reaction}>
-                    <Text style={styles.reaction_icon}>🦑</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.reaction}>
-                    <Text style={styles.reaction_icon}>🦑</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.reaction}>
-                    <Text style={styles.reaction_icon}>🦑</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.reaction}>
-                    <Text style={styles.reaction_icon}>🦑</Text>
-                </TouchableOpacity>
+        )
+    }else{
+        return (
+            <View style={styles.container}>
+                <ImageBackground source={{uri:post.data.meta.thumbnail}} blurRadius={2.5} style={styles.post}>
+                    <View style={styles.ratio}></View>
+                    <TouchableWithoutFeedback onPress={()=>{ onTap() }} onLongPress={()=> { Linking.openURL(post.data.meta.link_url) }}>
+                        <View style={styles.content}>
+                            <View style={styles.content_footer}>
+                                <TouchableOpacity style={styles.content_headerBtn} onPress={()=>{ onTapProfile(post.data.author) }}>
+                                    <Image
+                                        source={{uri:author.profilePicture}}
+                                        style={styles.content_profileImg}
+                                    />
+                                </TouchableOpacity>
+                                {/* <ImageBackground source={{uri:post.data.meta.provider_img}} style={styles.content_img}></ImageBackground> */}
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+    
+                </ImageBackground>
+    
             </View>
-
-        </View>
-    )
+        )
+    }
 }
 
 const styles = StyleSheet.create({
 
     container:{
-        flex:1,
-        marginHorizontal:16,
         marginTop:16,
         alignItems:'center',
+        width:((Dimensions.get('screen').width-48)/2),
+        marginLeft:16,
+        borderRadius:35,
+        overflow:'hidden'
     },
     ratio: {
         paddingTop:"100%"
@@ -82,7 +78,7 @@ const styles = StyleSheet.create({
     post: {
         aspectRatio:1,
         flex:1,
-        borderRadius:35,
+        // borderRadius:35,
         position:'relative',
         width:"100%",
     },
@@ -94,26 +90,7 @@ const styles = StyleSheet.create({
         top:0,
         left:0,
     },
-    content_headerBtn:{
-
-    },
-    content_header:{
-        flexDirection:'row',
-        alignItems:'center'
-    },
-    content_profileImg:{
-        width:32,
-        height:32,
-        resizeMode:'cover',
-        borderRadius:100
-    },
-    content_profileName:{
-        fontFamily:DefaultTheme.fonts.bold,
-        color:DefaultTheme.colors.whites.full,
-        fontSize:DefaultTheme.fontSizes.normal,
-        marginLeft:8
-    },
-
+    
     content_footer:{
         flexDirection:'row',
         marginTop:"auto",
@@ -121,27 +98,18 @@ const styles = StyleSheet.create({
         justifyContent:'space-between',
         position:'relative'
     }, 
-    content_name:{
-        width:"80%",
-        color:DefaultTheme.colors.whites.full,
-        fontFamily:DefaultTheme.fonts.bold,
-        fontSize:DefaultTheme.fontSizes.normal
+    content_profileImg:{
+        width:32,
+        height:32,
+        resizeMode:'cover',
+        borderRadius:100
     },
     content_img:{
-        width:"20%",
-        paddingTop:"20%",
+        width:32,
+        paddingTop:32,
         resizeMode:"contain",
+        borderRadius:100
     },
-
-    reactions:{
-        flexDirection:'row',
-        width:"100%",
-        justifyContent:'space-evenly',
-        paddingVertical:8
-    },
-    reaction_icon:{
-        fontSize:DefaultTheme.fontSizes.big
-    }
 
 
 })

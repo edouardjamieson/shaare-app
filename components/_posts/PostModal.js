@@ -1,271 +1,230 @@
 import React,{ useState, useEffect, useRef } from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, SafeAreaView, Linking, Modal } from 'react-native'
+import { WebView } from 'react-native-webview';
 import { DefaultTheme } from '../../theme/default'
 import { Dimensions } from 'react-native';
 import { Easing } from 'react-native-reanimated';
+import GestureRecognizer from 'react-native-swipe-gestures';
 
-export default function PostModal({post, isOpen, onClose}) {
+import {getUserById} from './../../database/users.db'
 
-    if(!isOpen){
-        return null
-    }
+export default function PostModal({post, isOpen, onClose, onTapProfile}) {
 
-    const viewAnim = useRef(new Animated.Value(0)).current
-    const boxAnim = useRef(new Animated.Value(300)).current
-    const openAnimation = () => {
-        Animated.timing(viewAnim, {
-            toValue:1,
-            duration:100,
-            useNativeDriver: false
-        }).start()
-        Animated.timing(boxAnim, {
-            easing:Easing.bezier(0.83, 0, 0.17, 1),
-            toValue:"0",
-            duration:300,
-            useNativeDriver: false
-        }).start()
-    }
-
-    const closeAnimation = () => {
-
-        Animated.timing(boxAnim, {
-            toValue:Dimensions.get('window').height,
-            duration:200,
-            useNativeDriver: false,
-            easing:Easing.bezier(0.83, 0, 0.17, 1),
-        }).start(({finished})=>{
-            if(finished){
-                Animated.timing(viewAnim, {
-                    toValue:0,
-                    duration:100,
-                    useNativeDriver: false
-                }).start(({finished})=>{ if(finished) onClose() })
-            }            
-        })
-    }
+    
+    if(!post) return null
+    // ====================================================================
+    // Get author details
+    // ====================================================================
+    const [author, setAuthor] = useState(null)
+    getUserById(post.data.author).then((result)=> {
+        setAuthor(result)
+    })
 
 
-    openAnimation()
+
+    // if(!author) return null
+
     return(
         <Modal
             visible={isOpen}
             animationType="slide"
+            style={{flex:5,borderWidth:0, width:"100%"}}
+            transparent={true}
         >
-            <SafeAreaView>
-
-                <TouchableOpacity onPress={()=>{ onClose() }}>
-                    <Text>Close</Text>
+            {author !== null ?
+            <SafeAreaView style={styles.container}>
+                <TouchableOpacity style={styles.exit} onPress={()=>{ onClose() }}>
+                    <Image source={require('./../../assets/images/icons/exit.png')} style={styles.exit_icon} />
                 </TouchableOpacity>
-            </SafeAreaView>
+                {/* header */}
+
+                <View style={styles.header}>
+                    <Image style={styles.user_pic} source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}/>
+                    <TouchableOpacity style={styles.user_names} onPress={()=>{ onTapProfile(post.id) }}>
+                        <Text style={styles.user_handle}>{author.handle}</Text>
+                        <Text style={styles.user_username}>@{author.username}</Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.header_btns}>
+                        <TouchableOpacity style={styles.header_btn}>
+                            <Image source={require('./../../assets/images/icons/bookmark.png')} style={styles.header_btn_icon} />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.header_btn}>
+                            <Image source={require('./../../assets/images/icons/follow_user.png')} style={styles.header_btn_icon} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <Text style={styles.title}>{post.data.meta.content_title}</Text>
+
+                {/* post */}
+                <View style={styles.post}>
+                    <View style={styles.ratio}></View>
+                    <View style={styles.webview}>
+                        {/* <WebView
+                            allowFileAccess={false}
+                            originWhitelist={['*']}
+                            source={{html: `
+                                <!DOCTYPE html>
+                                <html>
+                                    <head>
+                                        <meta charset='utf-8'/>
+                                        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                                        <style>
+                                        * {margin:0; padding:0}
+                                        html{height:100%;width:100%;overflow:hidden}
+                                        body{height:100%;width:100%;overflow:hidden}
+                                        iframe {height:101%;width:100%;overflow:hidden}
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <iframe src="${post.data.meta.preview_url}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                                    </body>
+                                </html>
+                            `}}
+                            style={styles.post_content}
+                        /> */}
+                    </View>
+                    
+                </View>
+
+                {/* reactions */}
+                <View style={styles.reactions}>
+                    <TouchableOpacity style={styles.reaction}>
+                        <Text style={styles.reaction_icon}>{author.reactions[0]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.reaction}>
+                        <Text style={styles.reaction_icon}>{author.reactions[1]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.reaction}>
+                        <Text style={styles.reaction_icon}>{author.reactions[2]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.reaction}>
+                        <Text style={styles.reaction_icon}>{author.reactions[3]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.reaction}>
+                        <Text style={styles.reaction_icon}>{author.reactions[4]}</Text>
+                    </TouchableOpacity>
+                </View>
+
+            </SafeAreaView>:<Text>yo</Text> }
 
 
         </Modal>
-        // <Animated.View style={[styles.modal_box, { display: isOpen ? "flex":"none", opacity:viewAnim }]}>
-        //     <SafeAreaView style={styles.container}>
-
-        //         <TouchableOpacity style={styles.closer} onPress={()=>{ closeAnimation() }}></TouchableOpacity>
-        //         <Animated.View style={[styles.box, { transform:[{translateY:boxAnim}] }]}>
-        //             <View style={styles.modal_head}>
-        //                 <Image
-        //                     source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}
-        //                     style={styles.modal_user_pic}
-        //                 />
-        //                 <TouchableOpacity style={styles.modal_usernames}>
-        //                     <Text style={styles.modal_displayname}>edouardj😇</Text>
-        //                     <Text style={styles.modal_username}>@edouardjamieson</Text>
-        //                 </TouchableOpacity>
-        //                 <TouchableOpacity style={styles.modal_close_btn} onPress={()=>{ closeAnimation() }}>
-        //                     <Image
-        //                         source={require('./../../assets/images/icons/exit.png')}
-        //                         style={styles.modal_close_icon}
-        //                     />
-        //                 </TouchableOpacity>
-
-        //             </View>
-        //             <View style={styles.modal_body}>
-        //                 <Text style={styles.body_title}>Travis Scott - yo xd mamadou</Text>
-        //                 <TouchableOpacity onPress={()=>Linking.openURL(post.data.url)}>
-        //                     <Text style={styles.body_link}>{post.data.url}</Text>
-        //                 </TouchableOpacity>
-        //             </View>
-        //             <View style={styles.modal_buttons}>
-
-        //                 <TouchableOpacity style={styles.modal_btn}>
-        //                     <View style={styles.btn_container}>
-        //                         <Image
-        //                             source={require('../../assets/images/icons/follow_user.png')}
-        //                             style={styles.btn_img}
-        //                         />
-        //                     </View>
-        //                     <Text style={styles.btn_label}>Follow user</Text>
-        //                 </TouchableOpacity>
-        //                 <TouchableOpacity style={styles.modal_btn}>
-        //                     <View style={styles.btn_container}>
-        //                         <Image
-        //                             source={require('../../assets/images/icons/bookmark.png')}
-        //                             style={styles.btn_img}
-        //                         />
-        //                     </View>
-        //                     <Text style={styles.btn_label}>Bookmark</Text>
-        //                 </TouchableOpacity>
-        //                 <TouchableOpacity style={styles.modal_btn}>
-        //                     <View style={styles.btn_container}>
-        //                         <Image
-        //                             source={require('../../assets/images/icons/action_back.png')}
-        //                             style={styles.btn_img}
-        //                         />
-        //                     </View>
-        //                     <Text style={styles.btn_label}>Shaare back</Text>
-        //                 </TouchableOpacity>
-        //                 <TouchableOpacity style={styles.modal_btn}>
-        //                     <View style={styles.btn_container}>
-        //                         <Image
-        //                             source={require('../../assets/images/icons/alert.png')}
-        //                             style={styles.btn_img}
-        //                         />
-        //                     </View>
-        //                     <Text style={styles.btn_label}>Report post</Text>
-        //                 </TouchableOpacity>
-                        
-        //             </View>
-        //         </Animated.View>
-
-        //     </SafeAreaView>
-        // </Animated.View>
     )
 
 }
 
 const styles = StyleSheet.create({
 
-    modal_box:{
-        width:"100%",
-        height:"100%",
-        flex:1,
-        position:'absolute',
-        backgroundColor:DefaultTheme.colors.darks.mid,
-        borderWidth:0,
-        zIndex:1000000
-    },
-
     container:{
-        position:'relative',
         flex:1,
-        height:"100%"
+        backgroundColor:DefaultTheme.colors.darks.quad,
+        justifyContent:'center',
+        position:'relative'
     },
-
-    closer:{
-        position:'relative',
-        flex:1,
-    },
-
-    box: {
-        borderColor:DefaultTheme.colors.primary,
-        borderWidth:3,
-        borderRadius:35,
-        backgroundColor:DefaultTheme.colors.dark,
+    exit:{
+        width:32,
+        height:32,
+        borderRadius:100,
+        alignItems:'center',
+        justifyContent:'center',
         position:'absolute',
-        width:Dimensions.get('window').width - 32,
-        margin:16,
-        padding:16,
-        bottom:0
+        bottom:"100%",
+        right:16
+    },
+    exit_icon:{
+        tintColor:DefaultTheme.colors.whites.full,
+        width:32,
+        height:32,
+        resizeMode:'contain'
     },
 
-
-    modal_head:{
+    header:{
+        width:"100%",
         flexDirection:'row',
-        alignItems:'center'
+        alignItems:'center',
+        paddingHorizontal:16
     },
-
-    modal_user_pic:{
+    user_pic:{
         width:48,
         height:48,
+        borderRadius:100,
         resizeMode:'cover',
-        borderRadius:360,
         marginRight:16
     },
-
-    modal_usernames:{
+    user_names:{
         justifyContent:'center'
     },
-    modal_displayname:{
+    user_handle:{
         fontFamily:DefaultTheme.fonts.bold,
         fontSize:DefaultTheme.fontSizes.medium,
         color:DefaultTheme.colors.whites.full,
     },
-    modal_username:{
+    user_username:{
         fontFamily:DefaultTheme.fonts.medium,
         fontSize:DefaultTheme.fontSizes.small,
         color:DefaultTheme.colors.whites.tier,
     },
-    modal_close_btn:{
-        width:32,
-        height:32,
-        borderRadius:100,
-        backgroundColor:DefaultTheme.colors.whites.tier,
-        alignItems:'center',
-        justifyContent:'center',
-        marginLeft:'auto'
-    },
-    modal_close_icon:{
-        tintColor:DefaultTheme.colors.primary,
-        width:24,
-        height:24,
-        resizeMode:'contain'
-    },
-
-    modal_body:{
-        marginTop:8,
-        borderBottomColor:DefaultTheme.colors.whites.tier,
-        borderBottomWidth:1
-    },
-    body_title:{
-        fontFamily:DefaultTheme.fonts.bold,
-        fontSize:DefaultTheme.fontSizes.normal,
-        color:DefaultTheme.colors.whites.full,
-        marginBottom:8
-    },
-    body_link:{
-        color:DefaultTheme.colors.primary,
-        fontFamily:DefaultTheme.fonts.regular,
-        fontSize:DefaultTheme.fontSizes.small,
-        marginBottom:16
-    },
-
-    modal_buttons:{
+    
+    header_btns:{
         flexDirection:'row',
-        width:"100%",
-        justifyContent:'space-between',
-        marginVertical:8
+        alignItems:'center',
+        marginLeft:'auto',
     },
-    modal_btn:{
-        alignItems:'center'
-    },
-    btn_container:{
-        width:48,
-        height:48,
+    header_btn:{
+        marginLeft:8,
         backgroundColor:DefaultTheme.colors.whites.tier,
-        borderRadius:360,
         alignItems:'center',
         justifyContent:'center',
-        marginBottom:8
+        height:40,
+        width:40,
+        borderRadius:100
     },
-    btn_img:{
+    header_btn_icon:{
         width:24,
         height:24,
-        tintColor:"#fff",
+        tintColor:DefaultTheme.colors.whites.full,
         resizeMode:'contain'
     },
-    btn_label:{
-        fontSize:DefaultTheme.fontSizes.tiny,
-        fontFamily:DefaultTheme.fonts.bold,
-        color:DefaultTheme.colors.whites.mid
+
+    title:{
+        fontFamily:DefaultTheme.fonts.medium,
+        fontSize:DefaultTheme.fontSizes.medium,
+        color:DefaultTheme.colors.whites.full,
+        paddingHorizontal:16,
+        marginTop:8
+    },
+
+
+    post:{
+        position:'relative',
+        backgroundColor:'red',
+        margin:16,
+        borderRadius:35,
+        overflow:'hidden'
+    },
+    ratio:{
+        paddingTop:'100%',
+        zIndex:1
+    },
+    webview:{
+        position:'absolute',
+        width:'100%',
+        height:'100%',
+        flex:1,
+        zIndex:2
+    },
+
+
+    reactions:{
+        width:"100%",
+        flexDirection:'row',
+        alignItems:'center',
+        paddingHorizontal:16,
+        justifyContent:'space-evenly'
+    },
+    reaction_icon:{
+        fontSize:DefaultTheme.fontSizes.super
     }
-
-
-
-
-
-
 
 })

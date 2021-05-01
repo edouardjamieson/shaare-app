@@ -47,15 +47,26 @@ async function getSinglePost(data) {
 // ====================================================================
 async function insertPost(data) {
 
+    let meta
+    meta = await fetch(`https://iframe.ly/api/iframely?url=${data.url}&api_key=622dd247d07c0f4ed20da2`)
+    meta = await meta.json()
+    const previewUrl = meta.hasOwnProperty("player") ? meta.links.player[0].href : data.url
+    const metainf = {
+        link_url:data.url,
+        preview_url:previewUrl,
+        thumbnail:meta.links.thumbnail[0].href,
+        content_title:meta.meta.title,
+        provider:meta.meta.site,
+        provider_img:meta.links.icon[0].href
+    }
     const post = {
         author:data.author,
-        url:data.url,
         category:data.category,
         created_at:data.created_at,
         keyword:data.keyword,
-        provider:data.provider,
         reactions:[],
-        warnings:data.warnings
+        warnings:data.warnings,
+        meta:metainf
     }
 
     const query = await db.collection('posts').add(post)

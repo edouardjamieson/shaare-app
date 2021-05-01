@@ -11,7 +11,7 @@ export default function Search() {
 
     useEffect(() => {
         
-        getPopularKeywords()
+        // getPopularKeywords()
 
     }, [])
 

@@ -17,6 +17,7 @@ export default function Home({navigation}) {
     const [modalVisible, setModalVisible] = useState(false)
     const [modalPost, setModalPost] = useState(null)
     const [posts, setPosts] = useState(null)
+    const [category, setCategory] = useState(null)
     
     // ====================================================================
     // Builds posts list after render
@@ -37,8 +38,9 @@ export default function Home({navigation}) {
     // ====================================================================
     // Rebuilds posts list on demande
     // ====================================================================
-    const buildList = ({ category, equation }) => {
+    useEffect(() => {
 
+        console.log(category);
         setPosts(null)
         
         if(category === "none"){
@@ -63,8 +65,7 @@ export default function Home({navigation}) {
 
         }
 
-
-    }
+    }, [category])
     
 
     // ====================================================================
@@ -75,6 +76,7 @@ export default function Home({navigation}) {
             <SinglePost
                 post={item}
                 onTap={()=>{ setModalPost(item); setModalVisible(true); }}
+                onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
             />
         )
     }
@@ -109,7 +111,7 @@ export default function Home({navigation}) {
         <SafeAreaView style={globalStyles.safeArea}>
             <View style={{flex:1}}>
                 <Header isShaareButtonVisible={true} onPressShaare={()=>{ navigation.navigate('Shaare') }}/>
-                <PostsCategoryList onChange={ (cat)=>{ buildList({category:cat.set_to}) } }/>
+                <PostsCategoryList onChange={ (cat)=>{ setCategory(cat.set_to) } }/>
 
                 {!posts ? <Text style={{fontSize:50, color:"red"}}>XD</Text> : null}
     
@@ -118,9 +120,11 @@ export default function Home({navigation}) {
                     <FlatList 
                         data={posts}
                         renderItem={renderPosts}
-                        keyExtractor={post => post.id}
-                        key={post => post.id}
+                        // keyExtractor={post => post.id}
+                        // key={post => post.id}
                         showsVerticalScrollIndicator={false}
+                        horizontal={false}
+                        numColumns={2}
                     />
                 }
                         
@@ -129,6 +133,7 @@ export default function Home({navigation}) {
                 isOpen={modalVisible}
                 post={modalPost}
                 onClose={()=>{ setModalVisible(false); setModalPost(null); }}
+                onTapProfile={(id)=>{setModalVisible(false);navigation.navigate('ProfileOther', {id:id})}}
             />
         </SafeAreaView>
     )

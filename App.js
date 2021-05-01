@@ -16,6 +16,7 @@ import Tabs from './components/_navigation/Tabs'
 import Home from './screens/Home'
 import Login from './screens/Login'
 import Shaare from './screens/Shaare'
+import ProfileOther from './screens/ProfileOther'
 
 const Stack = createStackNavigator()
 export default function App() {
@@ -57,6 +58,7 @@ export default function App() {
             <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home" mode="modal">
               <Stack.Screen screenOptions={{gestureEnabled: false}} name="Home" component={Tabs} />
               <Stack.Screen name="Shaare" component={Shaare}/>
+              <Stack.Screen name="ProfileOther" component={ProfileOther} />
             </Stack.Navigator>
   
           </NavigationContainer>
