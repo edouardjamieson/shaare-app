@@ -1,26 +1,35 @@
-import {db} from './../firebase'
+import {db, vf} from './../firebase'
 
 // ====================================================================
 // GET POST LIST
 // ====================================================================
 async function getPosts({category, equation, userID}) {
 
-    const col = db.collection('posts')
-    let doc
-    if(category && category != "none"){
-        doc = await col
-        .where("category", "==", category)
-        .get()
+    const posts = db.collection('posts')
+    const users = await db.collection('users').get()
 
-    }else if(category === "none" || !category){
-        doc = await col.get()
+    let posts_doc
+
+    if(category && category != "none"){
+        posts_doc = await posts.where("category","==",category).get()
+    }else{
+        posts_doc = await posts.get()
     }
 
+    if(!posts_doc.empty){
 
-    if(!doc.empty) {
-        return doc.docs.map((doc)=>({id:doc.id, data:doc.data()}))
-    }else{
-        return 0
+        return posts_doc.docs.map((doc)=>({
+            post:{
+                id:doc.id,
+                data:doc.data()
+            },
+            user:{
+                id:doc.data().author,
+                data:users.docs.filter(u => u.id === doc.data().author)[0].data()
+            }
+        }))
+
+
     }
 
 }
@@ -39,6 +48,24 @@ async function getSinglePost(data) {
     }else{
         
     }
+
+}
+
+// ====================================================================
+// REACT TO POST
+// ====================================================================
+async function reactToPost(postID, userID, reaction_index, set) {
+
+    if(set === true){
+        const query = await db.collection('posts').doc(postID).update({
+            reactions:vf.arrayUnion({uid:userID, reaction_index:reaction_index})
+        })
+    }else{
+        const query = await db.collection('posts').doc(postID).update({
+            reactions:vf.arrayRemove({uid:userID, reaction_index:reaction_index})
+        })
+    }
+
 
 }
 
@@ -76,4 +103,5 @@ async function insertPost(data) {
 
 
 
-export {getPosts, getSinglePost, insertPost}
+
+export {getPosts, getSinglePost, reactToPost, insertPost}

@@ -4,8 +4,9 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Animated, Te
 import { DefaultTheme } from '../theme/default'
 import { Easing } from 'react-native-reanimated';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {checkIfContainsBadwords} from './../badwords'
+import {URL} from 'react-native-url-polyfill'
 
+import {checkIfContainsBadwords} from './../badwords'
 import {insertPost} from './../database/posts.db'
 import {getCachedUser} from './../database/users.db'
 

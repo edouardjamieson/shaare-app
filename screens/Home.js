@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useCallback} from 'react'
 import {Text, View, SafeAreaView, FlatList, Alert, Modal} from 'react-native'
 import Header from './../components/_header/Header'
 import {globalStyles} from '../assets/styles/global.style'
@@ -26,60 +26,41 @@ export default function Home({navigation}) {
         if(!posts){
             getPosts({category:"none"})
             .then((docs)=>{
-                setPosts(
-                    docs.map((doc)=>({ id:doc.id, data:doc.data }))
-                )
+                setPosts(docs)
             }) 
         }
 
-        getCachedUser().then(val => {console.log(val)})
+        getCachedUser().then(val => {console.log(`Currently logged has ${val.data.handle} (@${val.data.username})`)})
     }, [])
 
     // ====================================================================
-    // Rebuilds posts list on demande
+    // Handle reaction changes
     // ====================================================================
-    useEffect(() => {
-
-        console.log(category);
-        setPosts(null)
-        
-        if(category === "none"){
-            //for me
-            getPosts({category:"none"})
-            .then((docs)=>{
-                setPosts(
-                    docs.map((doc)=>({ id:doc.id, data:doc.data }))
-                )
-            })
-
-
-        }else{
-            //category
-            getPosts({category:category})
-            .then((docs)=>{
-                if(docs === 0) return setPosts("empty")
-                setPosts(
-                    docs.map((doc)=>({ id:doc.id, data:doc.data }))
-                )
-            })
-
-        }
-
-    }, [category])
+    const reactionHanlder = (postID, userID, i, set) => {
+        let reacted_post = posts.filter(p => p.post.id === postID)[0]
+        let reactions = reacted_post.post.data.reactions
+        set === true ? reactions = [{uid:userID, reaction_index:i}, ...reactions] : reactions = reactions.filter(r => r.uid !== userID)
+        setPosts(posts.filter((p)=>{
+            if(p.post.id === postID){
+                p.post.data.reactions = reactions
+            }
+            return p
+        }))
+    }
     
 
     // ====================================================================
     // Renders single post
     // ====================================================================
-    const renderPosts = ({item, index}) => {
-        return(
+    const renderPosts = useCallback(
+        ({item, index}) => 
             <SinglePost
                 post={item}
                 onTap={()=>{ setModalPost(item); setModalVisible(true); }}
                 onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
             />
-        )
-    }
+        ,[] 
+    )
 
     // ====================================================================
     // No results view
@@ -120,8 +101,7 @@ export default function Home({navigation}) {
                     <FlatList 
                         data={posts}
                         renderItem={renderPosts}
-                        // keyExtractor={post => post.id}
-                        // key={post => post.id}
+                        keyExtractor={item => item.post.id}
                         showsVerticalScrollIndicator={false}
                         horizontal={false}
                         numColumns={2}
@@ -134,6 +114,7 @@ export default function Home({navigation}) {
                 post={modalPost}
                 onClose={()=>{ setModalVisible(false); setModalPost(null); }}
                 onTapProfile={(id)=>{setModalVisible(false);navigation.navigate('ProfileOther', {id:id})}}
+                onReact={(postID, userID, i, set)=>{ reactionHanlder(postID, userID, i, set) }}
             />
         </SafeAreaView>
     )

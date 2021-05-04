@@ -7,59 +7,29 @@ import PostModal from './PostModal'
 import {getUserById} from './../../database/users.db'
 
 export default function SinglePost({post, onTap, onTapProfile}) {
-
-    // ====================================================================
-    // Get author
-    // ====================================================================
-    const [author, setAuthor] = useState(null)
-    getUserById(post.data.author).then((result)=> {
-        setAuthor(result)
-    })
-    .catch(err=> console.log(err))
-
-    // ====================================================================
-    // Loader
-    // ====================================================================
-    const [isLoading, setIsLoading] = useState(true)
-    useEffect(() => {
-        
-        // console.log("test");
-        // setIsLoading(false)
-        console.log(author);
-
-    }, [author])
     
-
-    if(isLoading){
-        return (
-            <LinearGradient colors={DefaultTheme.colors.mainGradientArray} style={styles.post}>
+    return (
+        <View style={styles.container}>
+            <ImageBackground source={{uri:post.post.data.meta.thumbnail}} blurRadius={2.5} style={styles.post}>
                 <View style={styles.ratio}></View>
-            </LinearGradient>
-        )
-    }else{
-        return (
-            <View style={styles.container}>
-                <ImageBackground source={{uri:post.data.meta.thumbnail}} blurRadius={2.5} style={styles.post}>
-                    <View style={styles.ratio}></View>
-                    <TouchableWithoutFeedback onPress={()=>{ onTap() }} onLongPress={()=> { Linking.openURL(post.data.meta.link_url) }}>
-                        <View style={styles.content}>
-                            <View style={styles.content_footer}>
-                                <TouchableOpacity style={styles.content_headerBtn} onPress={()=>{ onTapProfile(post.data.author) }}>
-                                    <Image
-                                        source={{uri:author.profilePicture}}
-                                        style={styles.content_profileImg}
-                                    />
-                                </TouchableOpacity>
-                                {/* <ImageBackground source={{uri:post.data.meta.provider_img}} style={styles.content_img}></ImageBackground> */}
-                            </View>
+                <TouchableWithoutFeedback onPress={()=>{ onTap() }} onLongPress={()=> { Linking.openURL(post.post.data.meta.link_url) }}>
+                    <View style={styles.content}>
+                        <View style={styles.content_footer}>
+                            <TouchableOpacity style={styles.content_headerBtn} onPress={()=>{ onTapProfile(post.user.id) }}>
+                                <Image
+                                    source={{uri:post.user.data.profilePicture}}
+                                    style={styles.content_profileImg}
+                                />
+                            </TouchableOpacity>
+                            {/* <Image source={{uri:post.data.meta.provider_img}} style={styles.content_img} /> */}
                         </View>
-                    </TouchableWithoutFeedback>
-    
-                </ImageBackground>
-    
-            </View>
-        )
-    }
+                    </View>
+                </TouchableWithoutFeedback>
+
+            </ImageBackground>
+
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
