@@ -6,7 +6,7 @@ import { Dimensions } from 'react-native';
 import { Easing } from 'react-native-reanimated';
 import GestureRecognizer from 'react-native-swipe-gestures';
 
-import {getCachedUser, getUserById} from './../../database/users.db'
+import {getCachedUser, savePost, followUser} from './../../database/users.db'
 import {reactToPost} from './../../database/posts.db'
 
 export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}) {
@@ -14,39 +14,103 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
     
     if(!post) return null
     const [isLoading, setIsLoading] = useState(true)
+    const [loggedUserID, setLoggedUserID] = useState(null)
 
     // ====================================================================
-    // Reactions
+    // Get reactions & actions
     // ====================================================================
     const [hasReacted, setHasReacted] = useState(null)
     const [reactBtnDisabled, setReactBtnDisabled] = useState(false)
-    const [loggedUserID, setLoggedUserID] = useState(null)
+    const [hasSavedPost, setHasSavedPost] = useState(null)
+    const [followsUser, setFollowsUser] = useState(null)
     useEffect(() => {
         getCachedUser().then(val => {
+            console.log(val);
             setLoggedUserID(val.id)
             const user_reaction = post.post.data.reactions.filter(r => r.uid === val.id)
-            if(user_reaction.length > 0){
-                setHasReacted(user_reaction[0])
-                setIsLoading(false)
-            }else{
-                setHasReacted(0)
-                setIsLoading(false)
-            }
+            user_reaction.length > 0 ? setHasReacted(user_reaction[0]) : setHasReacted(0)
+            
+            const user_saved = val.data.saved.filter(s => s === post.post.id)
+            user_saved.length > 0 ? setHasSavedPost(true) : setHasSavedPost(false)
+            
+            const user_follow = val.data.follows.filter(f => f === post.user.id)
+            user_follow.length > 0 ? setFollowsUser(true) : setFollowsUser(false)
+
+            setIsLoading(false)
         })
     }, [])
 
+    // ====================================================================
+    // Handle reactions change
+    // ====================================================================
+    const handleReactionTap = (i, set) => {
+        setReactBtnDisabled(true)
+        ReactAnimate()
+        reactToPost(post.post.id, loggedUserID, i, set).then((result)=>{
+            set === true ? setHasReacted({uid:loggedUserID, reaction_index:i}):setHasReacted(0)
+            setReactBtnDisabled(false)
+        })
+        onReact(post.post.id, loggedUserID, i, set)
+    }
+
+    // ====================================================================
+    // Handle post saving
+    // ====================================================================
+    const handleSavePost = () => {
+        let set = hasSavedPost === true ? false : true
+        savePost(loggedUserID, post.post.id, set).then(()=>{
+            setHasSavedPost(set)
+        })
+    }
+
+    // ====================================================================
+    // Handle user follow
+    // ====================================================================
+    const handleUserFollow = () => {
+        let set = followsUser === true ? false : true
+        followUser(loggedUserID, post.user.id, set).then(()=>{
+            setFollowsUser(set)
+        })
+    }
+
+    // ====================================================================
+    // Animations
+    // ====================================================================
+    const react_anim = useRef(new Animated.Value(1)).current;
+    const ReactAnimate = () => {
+        Animated.timing(react_anim, {
+            toValue:0,
+            duration:500,
+            easing:Easing.elastic(1),
+            useNativeDriver:false
+        }).start(({finished}) => {
+            if(finished){
+                Animated.timing(react_anim, {
+                    toValue:1,
+                    duration:500,
+                    easing:Easing.elastic(1),
+                    useNativeDriver:false
+                }).start()
+            }
+        })
+    }
+
+
+    if(isLoading) return (<Text>loading...</Text>)
+
     const GetReactions = () => {
+        if(loggedUserID === post.user.id) return null
         if(hasReacted !== 0){
             return(
-                <View style={styles.reactions}>
+                <Animated.View style={[styles.reactions, { opacity:react_anim, transform:[{scale:react_anim}] }]}>
                     <TouchableOpacity style={styles.reaction} onPress={()=> { handleReactionTap(hasReacted.reaction_index, false) }} disabled={reactBtnDisabled}>
                         <Text style={styles.reacted_icon}>{post.user.data.reactions[hasReacted.reaction_index]}</Text>
                     </TouchableOpacity>
-                </View>
+                </Animated.View>
             )
         }else{
             return(
-                <View style={styles.reactions}>
+                <Animated.View style={[styles.reactions, { opacity:react_anim, transform:[{scale:react_anim}] }]}>
                     <TouchableOpacity style={styles.reaction} onPress={()=> { handleReactionTap(0, true) }} disabled={reactBtnDisabled}>
                         <Text style={styles.reaction_icon}>{post.user.data.reactions[0]}</Text>
                     </TouchableOpacity>
@@ -62,31 +126,13 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
                     <TouchableOpacity style={styles.reaction} onPress={()=> { handleReactionTap(4, true) }} disabled={reactBtnDisabled}>
                         <Text style={styles.reaction_icon}>{post.user.data.reactions[4]}</Text>
                     </TouchableOpacity>
-                </View>
+                </Animated.View>
                 
             )
         }
 
 
     }
-
-    // ====================================================================
-    // Handle reactions change
-    // ====================================================================
-    const handleReactionTap = (i, set) => {
-        setReactBtnDisabled(true)
-        reactToPost(post.post.id, loggedUserID, i, set).then((result)=>{
-            set === true ? setHasReacted({uid:loggedUserID, reaction_index:i}):setHasReacted(0)
-            setReactBtnDisabled(false)
-        })
-        onReact(post.post.id, loggedUserID, i, set)
-    }
-
-
-
-    if(isLoading) return (<Text>loading...</Text>)
-
-    
 
     return(
         <Modal
@@ -109,12 +155,15 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
                     </TouchableOpacity>
 
                     <View style={styles.header_btns}>
-                        <TouchableOpacity style={styles.header_btn}>
+                        <TouchableOpacity onPress={()=>{handleSavePost()}} style={[styles.header_btn, { backgroundColor:hasSavedPost ? DefaultTheme.colors.primary : DefaultTheme.colors.whites.tier, }]}>
                             <Image source={require('./../../assets/images/icons/bookmark.png')} style={styles.header_btn_icon} />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.header_btn}>
-                            <Image source={require('./../../assets/images/icons/follow_user.png')} style={styles.header_btn_icon} />
-                        </TouchableOpacity>
+                        {
+                            loggedUserID === post.user.id ? null :
+                            <TouchableOpacity onPress={()=>{handleUserFollow()}} style={[styles.header_btn, { backgroundColor:followsUser ? DefaultTheme.colors.primary : DefaultTheme.colors.whites.tier, }]}>
+                                <Image source={require('./../../assets/images/icons/follow_user.png')} style={styles.header_btn_icon} />
+                            </TouchableOpacity>
+                        }
                     </View>
                 </View>
                 <Text style={styles.title}>{post.post.data.meta.content_title}</Text>
@@ -219,7 +268,6 @@ const styles = StyleSheet.create({
     },
     header_btn:{
         marginLeft:8,
-        backgroundColor:DefaultTheme.colors.whites.tier,
         alignItems:'center',
         justifyContent:'center',
         height:40,

@@ -17,14 +17,14 @@ export default function Home({navigation}) {
     const [modalVisible, setModalVisible] = useState(false)
     const [modalPost, setModalPost] = useState(null)
     const [posts, setPosts] = useState(null)
-    const [category, setCategory] = useState(null)
+    const [category, setCategory] = useState("none")
     
     // ====================================================================
     // Builds posts list after render
     // ====================================================================
     useEffect(() => {
         if(!posts){
-            getPosts({category:"none"})
+            getPosts({category:category})
             .then((docs)=>{
                 setPosts(docs)
             }) 
@@ -32,6 +32,18 @@ export default function Home({navigation}) {
 
         getCachedUser().then(val => {console.log(`Currently logged has ${val.data.handle} (@${val.data.username})`)})
     }, [])
+
+    // ====================================================================
+    // Builds posts list on category change
+    // ====================================================================
+    const changeCategory = (cat) => {
+        setCategory(cat)
+        getPosts({category:cat})
+        .then((docs)=>{
+            docs ? setPosts(docs) : setPosts("empty")
+            
+        }) 
+    }
 
     // ====================================================================
     // Handle reaction changes
@@ -92,7 +104,7 @@ export default function Home({navigation}) {
         <SafeAreaView style={globalStyles.safeArea}>
             <View style={{flex:1}}>
                 <Header isShaareButtonVisible={true} onPressShaare={()=>{ navigation.navigate('Shaare') }}/>
-                <PostsCategoryList onChange={ (cat)=>{ setCategory(cat.set_to) } }/>
+                <PostsCategoryList onChange={ (cat)=>{ changeCategory(cat.set_to) } }/>
 
                 {!posts ? <Text style={{fontSize:50, color:"red"}}>XD</Text> : null}
     

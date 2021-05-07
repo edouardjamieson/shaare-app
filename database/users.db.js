@@ -1,4 +1,4 @@
-import {db} from './../firebase'
+import {db, vf} from './../firebase'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SHA256 from 'crypto-js/sha256';
 
@@ -65,18 +65,13 @@ async function updateCachedUser(userID) {
     const user = await db.collection('users').doc(userID).get()
     if(user.empty) return 0
 
-    const u = user.docs[0]
     try {
-        await AsyncStorage.setItem('user', JSON.stringify({id:u.id, data:u.data()}))
+        await AsyncStorage.setItem('user', JSON.stringify({id:user.id, data:user.data()}))
         return 1
     } catch (error) {
         return 0
     }
 }
-
-// ====================================================================
-// UPDATE USER INFOS
-// ====================================================================
 
 // ====================================================================
 // GET USER BY ID
@@ -114,12 +109,14 @@ async function insertUser(data) {
     console.log(password);
     const date = Date.now()
 
-    let country
-    let region
-    country = await fetch("https://ipapi.co/json/")
-    country = await country.json()
-    region = country.region_code
-    country = country.country_code
+    let location
+    location = await fetch("https://ipapi.co/json/")
+    location = await location.json()
+    location = {
+        country: location.country_code,
+        region: location.region_code,
+        ip: location.ip
+    }
 
     const user = {
         username:data.username,
@@ -128,19 +125,46 @@ async function insertUser(data) {
         created_at:date,
         is_ban:false,
         strikes:0,
-        posts:[],
         reactions:["😎","👽","🎂","🤯","⚡️"],
-        country:country,
-        region:region,
+        location:location,
         role:"user",
         equation:"",
         profilePicture:"https://firebasestorage.googleapis.com/v0/b/shaare-6f9db.appspot.com/o/profile_pictures%2Fdefault.png?alt=media&token=f5cc1035-48e9-4b53-af21-f1dbfe83b5a0",
-        saved:[]
+        saved:[],
+        follows:[],
+        blocked:[]
     }
 
     const query = await db.collection('users').add(user)
 
 }
+
+// ====================================================================
+// SAVE POST
+// ====================================================================
+async function savePost(userID, postID, set) {
+
+    const query = await db.collection('users').doc(userID).update({
+        saved:set === true ? vf.arrayUnion(postID) : vf.arrayRemove(postID)
+    }).then(()=>{
+        updateCachedUser(userID)
+    })
+
+}
+
+// ====================================================================
+// FOLLOW USER
+// ====================================================================
+async function followUser(followerID, followedID, set) {
+
+    const query = await db.collection('users').doc(followerID).update({
+        follows:set === true ? vf.arrayUnion(followedID) : vf.arrayRemove(followedID)
+    }).then(()=>{
+        updateCachedUser(followerID)
+    })
+
+}
+
 
 export {
     logInUser,
@@ -150,4 +174,6 @@ export {
     getUserById,
     logOutUser,
     insertUser,
+    savePost,
+    followUser
 }

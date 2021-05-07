@@ -22,7 +22,7 @@ export default function Shaare({navigation}) {
         setError({title:title, text:text})
         setTimeout(() => {
             setError(null)
-        }, 2500);
+        }, 3000);
     }
 
     const validate = () => {
@@ -54,7 +54,14 @@ export default function Shaare({navigation}) {
         }
 
         //url is good so get infos
-        const URI = new URL(url_string)
+        let URI
+        try {
+            URI = new URL(url_string)
+        } catch (error) {
+            triggerError("Oups!", "That doesn't look like a URL.")
+            setIsValidating(false)
+            return
+        }
         let host = URI.hostname
         if(host.split(".").length > 2){
             host = host.replace(/^[^.]+\./g, "");
@@ -94,8 +101,7 @@ export default function Shaare({navigation}) {
                 navigation.navigate('Home')
             })
             .catch(err => {
-                triggerError("Oups!", "There was an error. Please try again.")
-                console.log(err);
+                triggerError("Oups!", "Sorry but you can't shaare that.")
                 setIsValidating(false)
             })
 
@@ -187,6 +193,7 @@ export default function Shaare({navigation}) {
                     <FlatList
                         data={category}
                         horizontal
+                        key={item=>item.set_to}
                         showsHorizontalScrollIndicator={false}
                         renderItem={RenderCategoryItem}
                         style={styles.list}

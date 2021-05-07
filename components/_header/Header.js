@@ -5,9 +5,7 @@ import {globalStyles} from './../../assets/styles/global.style'
 import {DefaultTheme} from './../../theme/default'
 import Shaare from '../../screens/Shaare';
 
-export default function Header({isShaareButtonVisible, onPressShaare}) {
-
-    const [isShaareVisible, setShaareVisible] = useState(false)
+export default function Header({isShaareButtonVisible, onPressShaare, areProfileButtonsVisible, onProfileAction}) {
 
     return (
         <View style={styles.header}>
@@ -21,6 +19,20 @@ export default function Header({isShaareButtonVisible, onPressShaare}) {
                 <Text style={styles.button_text}>Shaare</Text>
                 </LinearGradient>
             </TouchableOpacity>
+            : null}
+
+            {areProfileButtonsVisible === true ?
+            <View style={styles.profile_btns}>
+                <TouchableOpacity onPress={()=>{ onProfileAction('bookmarked') }} style={styles.profile_button}>
+                    <Image source={require('./../../assets/images/icons/bookmark.png')} style={styles.profile_btn_icon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>{ onProfileAction('editmode') }} style={styles.profile_button}>
+                    <Image source={require('./../../assets/images/icons/edit.png')} style={styles.profile_btn_icon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>{ onProfileAction('settings') }} style={styles.profile_button}>
+                    <Image source={require('./../../assets/images/icons/settings.png')} style={styles.profile_btn_icon} />
+                </TouchableOpacity>
+            </View>
             : null}
         </View>
     )
@@ -53,6 +65,21 @@ const styles = StyleSheet.create({
         fontSize:DefaultTheme.fontSizes.medium,
         fontFamily:DefaultTheme.fonts.bold,
         color:DefaultTheme.colors.whites.full,
+    },
+
+    profile_btns:{
+        flexDirection:'row',
+        alignItems:'center',
+        marginLeft:'auto',
+    },
+    profile_button:{
+        marginLeft:16
+    },
+    profile_btn_icon:{
+        width:24,
+        height:24,
+        resizeMode:'contain',
+        tintColor:DefaultTheme.colors.whites.mid
     }
 })
 
