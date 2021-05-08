@@ -3,17 +3,32 @@ import {db, vf} from './../firebase'
 // ====================================================================
 // GET POST LIST
 // ====================================================================
-async function getPosts({category, equation, userID}) {
+async function getPosts(data) {
+
+    const category = data.category || ""
+    const equation = data.equation || ""
+    const callerID = data.callerID || ""
+
 
     const posts = db.collection('posts')
     const users = await db.collection('users').get()
 
     let posts_doc
-
-    if(category && category != "none"){
-        posts_doc = await posts.where("category","==",category).get()
-    }else{
-        posts_doc = await posts.get()
+    switch (category) {
+        case "":
+            break;
+        case "none":
+            posts_doc = await posts.get()
+            break;
+        case "category":
+            posts_doc = await posts.where("category","==",category).get()
+            break;
+        case "singleUser":
+            posts_doc = await posts.doc(callerID).get()
+            break;
+        default:
+            return 0
+            break;
     }
 
     if(!posts_doc.empty){

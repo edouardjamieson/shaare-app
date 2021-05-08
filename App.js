@@ -13,7 +13,6 @@ import {DefaultTheme} from './theme/default'
 import {checkIfUserIsLoggedIn} from './database/users.db'
 
 import Tabs from './components/_navigation/Tabs'
-import Home from './screens/Home'
 import Login from './screens/Login'
 import Shaare from './screens/Shaare'
 import ProfileOther from './screens/ProfileOther'
