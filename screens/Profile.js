@@ -1,13 +1,16 @@
 import React, {useState, useEffect} from 'react'
-import { View, Text, Image, SafeAreaView, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native'
+import { View, Text, Image, SafeAreaView, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList } from 'react-native'
 
 import {globalStyles} from './../assets/styles/global.style'
 import {DefaultTheme} from './../theme/default'
 
 import Header from './../components/_header/Header'
+import SinglePost from './../components/_posts/SinglePost'
 
 import {getCachedUser, logOutUser} from './../database/users.db'
 import {getPosts} from './../database/posts.db.js'
+import PostModal from './../components/_posts/PostModal';
+import ProfileActions from './ProfileActions'
 
 export default function Profile() {
 
@@ -15,28 +18,47 @@ export default function Profile() {
     const [user, setUser] = useState(null)
     const [posts, setPosts] = useState(null)
 
+    const [modalVisible, setModalVisible] = useState(false)
+    const [modalPost, setModalPost] = useState(null)
+
+    const [profileActionsVisible, setProfileActionsVisible] = useState(true)
+    const [profileActionContent, setProfileActionContent] = useState(null)
+
     useEffect(() => {
-        getCachedUser().then(val => {
-            console.log(val);
-            
+        getCachedUser().then(val => {            
             setUser(val)
-        })
-        getPosts({category:"singleUser", calledID:user.id})
-        .then((docs)=>{
-            setPosts(docs)
+            getPosts({category:"singleUser", callerID:val.id})
+            .then((docs)=>{
+                setPosts(docs)
+                setIsLoading(false)
+            })
         })
         
-        setIsLoading(false)
 
     }, [])
 
     if(isLoading) return null
 
+    // ====================================================================
+    // Render posts
+    // ====================================================================
+    const renderPosts = ({item, index}) => {
+        return <SinglePost
+            post={item}
+            onTap={()=>{ setModalPost(item); setModalVisible(true); }}
+            onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
+        />
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeArea}>
             <View style={{flex:1}}>
 
-                <Header isShaareButtonVisible={false} areProfileButtonsVisible={true}/>
+                <Header
+                    isShaareButtonVisible={false}
+                    areProfileButtonsVisible={true}
+                    onProfileAction={(action)=>{ setProfileActionContent(action); setProfileActionsVisible(true) }}
+                />
                 <ScrollView>
 
                     <View style={styles.profile_header}>
@@ -51,10 +73,30 @@ export default function Profile() {
                             <Text style={styles.reaction}>{user.data.reactions[4]}</Text>
                         </View>
                     </View>
+
+                    <FlatList 
+                        data={posts}
+                        renderItem={renderPosts}
+                        keyExtractor={item => item.post.id}
+                        showsVerticalScrollIndicator={false}
+                        horizontal={false}
+                        numColumns={2}
+                    />
                 </ScrollView>
                 
                 
             </View>
+            <PostModal
+                isOpen={modalVisible}
+                post={modalPost}
+                onClose={()=>{ setModalVisible(false); setModalPost(null); }}
+                onTapProfile={()=>{ setModalVisible(false); setModalPost(null); }}
+            />
+            <ProfileActions
+                isOpen={profileActionsVisible}
+                onClose={()=>{setProfileActionsVisible(false); setProfileActionContent(null)}}
+                contentType={profileActionContent}
+            />
         </SafeAreaView>
     )
 }

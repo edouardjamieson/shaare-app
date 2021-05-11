@@ -26,7 +26,7 @@ export default function Header({isShaareButtonVisible, onPressShaare, areProfile
                 <TouchableOpacity onPress={()=>{ onProfileAction('bookmarked') }} style={styles.profile_button}>
                     <Image source={require('./../../assets/images/icons/bookmark.png')} style={styles.profile_btn_icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{ onProfileAction('editmode') }} style={styles.profile_button}>
+                <TouchableOpacity onPress={()=>{ onProfileAction('editprofile') }} style={styles.profile_button}>
                     <Image source={require('./../../assets/images/icons/edit.png')} style={styles.profile_btn_icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{ onProfileAction('settings') }} style={styles.profile_button}>

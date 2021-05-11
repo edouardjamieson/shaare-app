@@ -24,7 +24,7 @@ async function getPosts(data) {
             posts_doc = await posts.where("category","==",category).get()
             break;
         case "singleUser":
-            posts_doc = await posts.doc(callerID).get()
+            posts_doc = await posts.where("author", "==", callerID).get()
             break;
         default:
             return 0

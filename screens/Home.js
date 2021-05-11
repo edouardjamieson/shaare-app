@@ -64,15 +64,22 @@ export default function Home({navigation}) {
     // ====================================================================
     // Renders single post
     // ====================================================================
-    const renderPosts = useCallback(
-        ({item, index}) => 
-            <SinglePost
-                post={item}
-                onTap={()=>{ setModalPost(item); setModalVisible(true); }}
-                onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
-            />
-        ,[] 
-    )
+    // const renderPosts = useCallback(
+    //     ({item, index}) => 
+    //         <SinglePost
+    //             post={item}
+    //             onTap={()=>{ setModalPost(item); setModalVisible(true); }}
+    //             onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
+    //         />
+    //     ,[] 
+    // )
+    const renderPosts = ({item, index}) => {
+        return <SinglePost
+            post={item}
+            onTap={()=>{ setModalPost(item); setModalVisible(true); }}
+            onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
+        />
+    }
 
     // ====================================================================
     // No results view
