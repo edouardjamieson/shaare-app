@@ -1,16 +1,15 @@
 import React,{ useState, useEffect, useRef } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, SafeAreaView, Linking, Modal } from 'react-native'
+import { Alert, StyleSheet, Text, View, Image, TouchableOpacity, Animated, SafeAreaView, Linking, Modal } from 'react-native'
 import { WebView } from 'react-native-webview';
-import { DefaultTheme } from '../../theme/default'
-import { Dimensions } from 'react-native';
+import { DefaultTheme } from './../theme/default'
 import { Easing } from 'react-native-reanimated';
-import GestureRecognizer from 'react-native-swipe-gestures';
 
-import {getCachedUser, savePost, followUser} from './../../database/users.db'
-import {reactToPost} from './../../database/posts.db'
+import {getCachedUser, savePost, followUser} from './../database/users.db'
+import {getSinglePost, reactToPost, deletePost} from './../database/posts.db'
 
-export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}) {
+export default function PostDetails({route, navigation}) {
 
+    const post = route.params.post
     
     if(!post) return null
     const [isLoading, setIsLoading] = useState(true)
@@ -25,11 +24,14 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
     const [followsUser, setFollowsUser] = useState(null)
     useEffect(() => {
         getCachedUser().then(val => {
-            console.log(val);
             setLoggedUserID(val.id)
-            const user_reaction = post.post.data.reactions.filter(r => r.uid === val.id)
-            user_reaction.length > 0 ? setHasReacted(user_reaction[0]) : setHasReacted(0)
-            
+
+            getSinglePost({id: post.post.id})
+            .then((doc)=>{
+                const user_reaction = doc.data.reactions.filter(r => r.uid === val.id)
+                user_reaction.length > 0 ? setHasReacted(user_reaction[0]) : setHasReacted(0)
+            })
+
             const user_saved = val.data.saved.filter(s => s === post.post.id)
             user_saved.length > 0 ? setHasSavedPost(true) : setHasSavedPost(false)
             
@@ -50,7 +52,6 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
             set === true ? setHasReacted({uid:loggedUserID, reaction_index:i}):setHasReacted(0)
             setReactBtnDisabled(false)
         })
-        onReact(post.post.id, loggedUserID, i, set)
     }
 
     // ====================================================================
@@ -71,6 +72,26 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
         followUser(loggedUserID, post.user.id, set).then(()=>{
             setFollowsUser(set)
         })
+    }
+
+    // ====================================================================
+    // Handle delete
+    // ====================================================================
+    const handleDelete = () => {
+        Alert.alert(
+            "You're about to delete something!",
+            "Are you sure you want to delete this?",
+            [
+                {text:"Never mind", style:"cancel"},
+                {text:"Do it!", style:"destructive", onPress:()=>{
+                    deletePost(post.post.id)
+                    .then((r)=> {
+                        navigation.goBack()
+                    })
+                }}
+            ]
+        )
+
     }
 
     // ====================================================================
@@ -135,33 +156,31 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
     }
 
     return(
-        <Modal
-            visible={isOpen}
-            animationType="slide"
-            style={{flex:5,borderWidth:0, width:"100%"}}
-            transparent={true}
-        >
             <SafeAreaView style={styles.container}>
-                <TouchableOpacity style={styles.exit} onPress={()=>{ onClose() }}>
-                    <Image source={require('./../../assets/images/icons/exit.png')} style={styles.exit_icon} />
+                <TouchableOpacity style={styles.exit} onPress={()=>{ navigation.goBack() }}>
+                    <Image source={require('./../assets/images/icons/exit.png')} style={styles.exit_icon} />
                 </TouchableOpacity>
                 {/* header */}
 
                 <View style={styles.header}>
                     <Image style={styles.user_pic} source={{uri:post.user.data.profilePicture}}/>
-                    <TouchableOpacity style={styles.user_names} onPress={()=>{ onTapProfile(post.user.id) }}>
+                    <TouchableOpacity style={styles.user_names} onPress={()=>{ navigation.navigate('ProfileOther', {id:post.user.id}) }}>
                         <Text style={styles.user_handle}>{post.user.data.handle}</Text>
                         <Text style={styles.user_username}>@{post.user.data.username}</Text>
                     </TouchableOpacity>
 
                     <View style={styles.header_btns}>
                         <TouchableOpacity onPress={()=>{handleSavePost()}} style={[styles.header_btn, { backgroundColor:hasSavedPost ? DefaultTheme.colors.primary : DefaultTheme.colors.whites.tier, }]}>
-                            <Image source={require('./../../assets/images/icons/bookmark.png')} style={styles.header_btn_icon} />
+                            <Image source={require('./../assets/images/icons/bookmark.png')} style={styles.header_btn_icon} />
                         </TouchableOpacity>
                         {
-                            loggedUserID === post.user.id ? null :
+                            loggedUserID === post.user.id ?
+                            <TouchableOpacity onPress={()=>{handleDelete()}} style={[styles.header_btn, { backgroundColor:followsUser ? DefaultTheme.colors.primary : DefaultTheme.colors.whites.tier, }]}>
+                                <Image source={require('./../assets/images/icons/delete.png')} style={styles.header_btn_icon} />
+                            </TouchableOpacity>
+                            :
                             <TouchableOpacity onPress={()=>{handleUserFollow()}} style={[styles.header_btn, { backgroundColor:followsUser ? DefaultTheme.colors.primary : DefaultTheme.colors.whites.tier, }]}>
-                                <Image source={require('./../../assets/images/icons/follow_user.png')} style={styles.header_btn_icon} />
+                                <Image source={require('./../assets/images/icons/follow_user.png')} style={styles.header_btn_icon} />
                             </TouchableOpacity>
                         }
                     </View>
@@ -182,17 +201,19 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
                                         <meta charset='utf-8'/>
                                         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
                                         <style>
-                                        * {margin:0; padding:0}
+                                        * {margin:0; padding:0; user-select:none}
                                         html{height:100%;width:100%;overflow:hidden}
                                         body{height:100%;width:100%;overflow:hidden}
-                                        iframe {height:101%;width:100%;overflow:hidden}
+                                        body > div { padding-bottom:100%!important; }
+                                        img.full { width:100%; height:100%; object-fit:cover }
                                         </style>
                                     </head>
                                     <body>
-                                        <iframe src="${post.post.data.meta.preview_url}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                                        ${post.post.data.meta.preview ? post.post.data.meta.preview : `<img class='full' src='${post.post.data.meta.thumbnail}'>`}
                                     </body>
                                 </html>
                             `}}
+                            // source={{html: post.post.data.meta.preview}}
                             style={styles.post_content}
                         />
                     </View>
@@ -200,11 +221,9 @@ export default function PostModal({post, isOpen, onClose, onTapProfile, onReact}
                 </View>
 
                 {/* reactions */}
-                <GetReactions />
+                {hasReacted===null ? null : <GetReactions />}
+                
             </SafeAreaView>
-
-
-        </Modal>
     )
 
 }

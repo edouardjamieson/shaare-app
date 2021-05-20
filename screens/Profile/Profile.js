@@ -1,28 +1,21 @@
 import React, {useState, useEffect} from 'react'
-import { View, Text, Image, SafeAreaView, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList } from 'react-native'
+import { View, Text, Image, SafeAreaView, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList, RefreshControl } from 'react-native'
 
-import {globalStyles} from './../assets/styles/global.style'
-import {DefaultTheme} from './../theme/default'
+import {globalStyles} from '../../assets/styles/global.style'
+import {DefaultTheme} from '../../theme/default'
 
-import Header from './../components/_header/Header'
-import SinglePost from './../components/_posts/SinglePost'
+import Header from '../../components/_header/Header'
+import SinglePost from '../../components/_posts/SinglePost'
 
-import {getCachedUser, logOutUser} from './../database/users.db'
-import {getPosts} from './../database/posts.db.js'
-import PostModal from './../components/_posts/PostModal';
-import ProfileActions from './ProfileActions'
+import {getCachedUser, logOutUser} from '../../database/users.db'
+import {getPosts} from '../../database/posts.db.js'
 
-export default function Profile() {
+export default function Profile({route, navigation}) {
 
     const [isLoading, setIsLoading] = useState(true)
+    const [isRefreshing, setIsRefreshing] = useState(false)
     const [user, setUser] = useState(null)
     const [posts, setPosts] = useState(null)
-
-    const [modalVisible, setModalVisible] = useState(false)
-    const [modalPost, setModalPost] = useState(null)
-
-    const [profileActionsVisible, setProfileActionsVisible] = useState(true)
-    const [profileActionContent, setProfileActionContent] = useState(null)
 
     useEffect(() => {
         getCachedUser().then(val => {            
@@ -37,6 +30,20 @@ export default function Profile() {
 
     }, [])
 
+    // ====================================================================
+    // On refresh
+    // ====================================================================
+    const onRefresh = () => {
+        getCachedUser().then(val => {            
+            setUser(val)
+            getPosts({category:"singleUser", callerID:val.id})
+            .then((docs)=>{
+                setPosts(docs)
+                // setIsLoading(false)
+            })
+        })
+    }
+
     if(isLoading) return null
 
     // ====================================================================
@@ -45,7 +52,7 @@ export default function Profile() {
     const renderPosts = ({item, index}) => {
         return <SinglePost
             post={item}
-            onTap={()=>{ setModalPost(item); setModalVisible(true); }}
+            onTap={()=>{ navigation.navigate('PostDetails', { post:item }) }}
             onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
         />
     }
@@ -57,13 +64,26 @@ export default function Profile() {
                 <Header
                     isShaareButtonVisible={false}
                     areProfileButtonsVisible={true}
-                    onProfileAction={(action)=>{ setProfileActionContent(action); setProfileActionsVisible(true) }}
+                    onProfileAction={(action)=>{ navigation.navigate(action, {user:user}) }}
                 />
-                <ScrollView>
+                <ScrollView
+                refreshControl={
+                    <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={onRefresh}
+                    tintColor={"#fff"}
+                    colors={["#fff"]}
+                    />
+                }>
 
                     <View style={styles.profile_header}>
                         <Image source={{uri: user.data.profilePicture}} style={styles.profilepicture} />
-                        <Text style={styles.handle}>{user.data.handle}</Text>
+                        <View style={{flexDirection:'row', alignItems:'center'}}>
+                            <Text style={styles.handle}>{user.data.handle}</Text>
+                            {user.data.role !== 'user' ?
+                                <Image source={user.data.role === 'validated' ? require(`./../../assets/images/icons/validated-icon.png`):require(`./../../assets/images/icons/admin-icon.png`)} style={[styles.special_icon, {tintColor: user.data.role === "validated" ? "blue" : DefaultTheme.colors.primary}]} />
+                            : null}   
+                            </View>
                         <Text style={styles.username}>@{user.data.username}</Text>
                         <View style={styles.reactions}>
                             <Text style={styles.reaction}>{user.data.reactions[0]}</Text>
@@ -86,17 +106,6 @@ export default function Profile() {
                 
                 
             </View>
-            <PostModal
-                isOpen={modalVisible}
-                post={modalPost}
-                onClose={()=>{ setModalVisible(false); setModalPost(null); }}
-                onTapProfile={()=>{ setModalVisible(false); setModalPost(null); }}
-            />
-            <ProfileActions
-                isOpen={profileActionsVisible}
-                onClose={()=>{setProfileActionsVisible(false); setProfileActionContent(null)}}
-                contentType={profileActionContent}
-            />
         </SafeAreaView>
     )
 }
@@ -113,13 +122,20 @@ const styles = StyleSheet.create({
         resizeMode:'contain',
         borderRadius:360,
         borderWidth:3,
-        borderColor:DefaultTheme.colors.primary
+        borderColor:DefaultTheme.colors.primary,
+        marginBottom:8
+    },
+    special_icon:{
+        width:24,
+        height:24,
+        resizeMode:'contain',
+        display:'flex',
+        marginLeft:8
     },
     handle:{
         fontFamily:DefaultTheme.fonts.bold,
         fontSize:DefaultTheme.fontSizes.big,
         color:DefaultTheme.colors.whites.full,
-        marginTop:8
     },
     username:{
         fontFamily:DefaultTheme.fonts.medium,

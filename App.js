@@ -1,9 +1,8 @@
-import { StatusBar } from 'expo-status-bar';
 import React, {useState} from 'react';
 import * as Font from 'expo-font'
 import {useFonts} from 'expo-font'
 import AppLoading from 'expo-app-loading'
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -14,8 +13,13 @@ import {checkIfUserIsLoggedIn} from './database/users.db'
 
 import Tabs from './components/_navigation/Tabs'
 import Login from './screens/Login'
+import Logout from './screens/Logout'
+import PostDetails from './screens/PostDetails'
 import Shaare from './screens/Shaare'
-import ProfileOther from './screens/ProfileOther'
+import ProfileOther from './screens/Profile/Profile.other'
+import Bookmarked from './screens/Profile/Profile.bookmarked'
+import EditProfile from './screens/Profile/Profile.edit'
+import Settings from './screens/Profile/Profile.settings'
 
 const Stack = createStackNavigator()
 export default function App() {
@@ -41,11 +45,17 @@ export default function App() {
         <Login onLogin={ (data) => { setUser(data) } } />
       )
     }else{
+      const profilePageOptions = {
+        headerShown:true,
+        headerTintColor:'#fff',
+        headerTitleStyle:{ fontFamily:DefaultTheme.fonts.bold },
+        headerBackTitleVisible:false
+      }
       return (
           <NavigationContainer theme={{
             dark:true,
             colors:{
-              background:DefaultTheme.colors.dark
+              background:DefaultTheme.colors.dark,
             },
           }}>
             <StatusBar
@@ -54,10 +64,26 @@ export default function App() {
               barStyle={DefaultTheme.statusbar}
             />
   
-            <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home" mode="modal">
+            <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home" mode="cards">
               <Stack.Screen screenOptions={{gestureEnabled: false}} name="Home" component={Tabs} />
+              <Stack.Screen name="PostDetails" component={PostDetails}/>
               <Stack.Screen name="Shaare" component={Shaare}/>
-              <Stack.Screen name="ProfileOther" component={ProfileOther} />
+              {/* Profile Screens */}
+              <Stack.Screen name="ProfileOther" component={ProfileOther}/>
+              <Stack.Screen name="Bookmarked" component={Bookmarked} options={{
+                headerTitle:'Bookmarked 📒',
+                ...profilePageOptions
+              }}/>
+              <Stack.Screen name="EditProfile" component={EditProfile} options={{
+                headerTitle:'Edit profile ✍️',
+                ...profilePageOptions
+              }}/>
+              <Stack.Screen name="Settings" component={Settings} options={{
+                headerTitle:'Settings 🩺',
+                ...profilePageOptions
+              }}/>
+              <Stack.Screen name="Logout" component={Logout}/>
+
             </Stack.Navigator>
   
           </NavigationContainer>

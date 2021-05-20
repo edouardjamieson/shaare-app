@@ -1,10 +1,5 @@
 import React,{ useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback, Dimensions, ImageBackground, Linking } from 'react-native'
-import { LinearGradient } from 'expo-linear-gradient';
-import { DefaultTheme } from '../../theme/default'
-
-import PostModal from './PostModal'
-import {getUserById} from './../../database/users.db'
 
 export default function SinglePost({post, onTap, onTapProfile}) {
     

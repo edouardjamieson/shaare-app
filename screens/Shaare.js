@@ -101,6 +101,7 @@ export default function Shaare({navigation}) {
                 navigation.navigate('Home')
             })
             .catch(err => {
+                console.log(err);
                 triggerError("Oups!", "Sorry but you can't shaare that.")
                 setIsValidating(false)
             })
@@ -387,7 +388,7 @@ const styles = StyleSheet.create({
     },
 
 
-    footer:{
+  footer:{
         marginTop:'auto',
         width:Dimensions.get('window').width,
         marginLeft:-16,
@@ -422,5 +423,5 @@ const styles = StyleSheet.create({
         fontFamily:DefaultTheme.fonts.regular,
         color:DefaultTheme.colors.whites.full,
         fontSize:DefaultTheme.fontSizes.normal
-    }
+    }  
 })

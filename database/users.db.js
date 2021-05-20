@@ -165,6 +165,21 @@ async function followUser(followerID, followedID, set) {
 
 }
 
+// ====================================================================
+// UPDATE USER INFOS
+// ====================================================================
+async function updateUserInfos(userID, data) {
+
+    const query = await db.collection('users').doc(userID).update({
+        handle:data.handle,
+        bio:data.bio,
+        reactions:data.reactions
+    }).then(()=>{
+        updateCachedUser(userID)
+    })
+
+}
+
 
 export {
     logInUser,
@@ -175,5 +190,6 @@ export {
     logOutUser,
     insertUser,
     savePost,
-    followUser
+    followUser,
+    updateUserInfos
 }

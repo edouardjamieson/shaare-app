@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import React, {useState, useRef} from 'react'
-import {View, Text, Image, SafeAreaView, StyleSheet, Animated, TextInput, ScrollView, KeyboardAvoidingView, Platform, Dimensions} from 'react-native'
+import {View, Text, Image, SafeAreaView, StyleSheet, StatusBar, Animated, TextInput, ScrollView, KeyboardAvoidingView, Platform, Dimensions} from 'react-native'
 import { Easing } from 'react-native-reanimated';
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
@@ -142,6 +142,11 @@ export default function Login({ onLogin }) {
     return (
 
         <View style={styles.body}>
+            <StatusBar
+              animated={true}
+              backgroundColor={DefaultTheme.colors.dark}
+              barStyle={DefaultTheme.statusbar}
+            />
             <SafeAreaView style={styles.safe}>
 
                 {/* LOADING */}
@@ -460,7 +465,7 @@ const styles = StyleSheet.create({
 const onboarding = StyleSheet.create({
     image:{
         width:"100%",
-        height:200,
+        height:300,
         resizeMode:'contain',
         marginBottom:32
     },

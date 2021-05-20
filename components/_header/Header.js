@@ -1,9 +1,7 @@
 import React, { useState, useRef } from 'react'
 import {Image, View, StyleSheet, TouchableOpacity, Text} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
-import {globalStyles} from './../../assets/styles/global.style'
 import {DefaultTheme} from './../../theme/default'
-import Shaare from '../../screens/Shaare';
 
 export default function Header({isShaareButtonVisible, onPressShaare, areProfileButtonsVisible, onProfileAction}) {
 
@@ -23,13 +21,13 @@ export default function Header({isShaareButtonVisible, onPressShaare, areProfile
 
             {areProfileButtonsVisible === true ?
             <View style={styles.profile_btns}>
-                <TouchableOpacity onPress={()=>{ onProfileAction('bookmarked') }} style={styles.profile_button}>
+                <TouchableOpacity onPress={()=>{ onProfileAction('Bookmarked') }} style={styles.profile_button}>
                     <Image source={require('./../../assets/images/icons/bookmark.png')} style={styles.profile_btn_icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{ onProfileAction('editprofile') }} style={styles.profile_button}>
+                <TouchableOpacity onPress={()=>{ onProfileAction('EditProfile') }} style={styles.profile_button}>
                     <Image source={require('./../../assets/images/icons/edit.png')} style={styles.profile_btn_icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{ onProfileAction('settings') }} style={styles.profile_button}>
+                <TouchableOpacity onPress={()=>{ onProfileAction('Settings') }} style={styles.profile_button}>
                     <Image source={require('./../../assets/images/icons/settings.png')} style={styles.profile_btn_icon} />
                 </TouchableOpacity>
             </View>

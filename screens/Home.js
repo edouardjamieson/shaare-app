@@ -1,21 +1,17 @@
 import React, {useEffect, useState, useCallback} from 'react'
-import {Text, View, SafeAreaView, FlatList, Alert, Modal} from 'react-native'
+import {Text, View, SafeAreaView, FlatList, Alert, Modal, RefreshControl} from 'react-native'
 import Header from './../components/_header/Header'
 import {globalStyles} from '../assets/styles/global.style'
 
-import {db} from './../firebase'
-import {getPosts, getSinglePost} from './../database/posts.db'
+import {getPosts} from './../database/posts.db'
 import {getCachedUser} from './../database/users.db'
 
-import PostModal from './../components/_posts/PostModal';
 import PostsCategoryList from './../components/_posts/PostsCategoryList'
 import SinglePost from './../components/_posts/SinglePost'
 import { DefaultTheme } from '../theme/default'
 
 export default function Home({navigation}) {
 
-    const [modalVisible, setModalVisible] = useState(false)
-    const [modalPost, setModalPost] = useState(null)
     const [posts, setPosts] = useState(null)
     const [category, setCategory] = useState("none")
     
@@ -46,37 +42,24 @@ export default function Home({navigation}) {
     }
 
     // ====================================================================
-    // Handle reaction changes
+    // On refresh
     // ====================================================================
-    const reactionHanlder = (postID, userID, i, set) => {
-        let reacted_post = posts.filter(p => p.post.id === postID)[0]
-        let reactions = reacted_post.post.data.reactions
-        set === true ? reactions = [{uid:userID, reaction_index:i}, ...reactions] : reactions = reactions.filter(r => r.uid !== userID)
-        setPosts(posts.filter((p)=>{
-            if(p.post.id === postID){
-                p.post.data.reactions = reactions
-            }
-            return p
-        }))
+    const onRefresh = () => {
+        getPosts({category:category})
+        .then((docs)=>{
+            docs ? setPosts(docs) : setPosts("empty")
+            
+        }) 
     }
     
 
     // ====================================================================
     // Renders single post
     // ====================================================================
-    // const renderPosts = useCallback(
-    //     ({item, index}) => 
-    //         <SinglePost
-    //             post={item}
-    //             onTap={()=>{ setModalPost(item); setModalVisible(true); }}
-    //             onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
-    //         />
-    //     ,[] 
-    // )
     const renderPosts = ({item, index}) => {
         return <SinglePost
             post={item}
-            onTap={()=>{ setModalPost(item); setModalVisible(true); }}
+            onTap={()=>{ navigation.navigate('PostDetails', { post:item }) }}
             onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
         />
     }
@@ -113,7 +96,7 @@ export default function Home({navigation}) {
                 <Header isShaareButtonVisible={true} onPressShaare={()=>{ navigation.navigate('Shaare') }}/>
                 <PostsCategoryList onChange={ (cat)=>{ changeCategory(cat.set_to) } }/>
 
-                {!posts ? <Text style={{fontSize:50, color:"red"}}>XD</Text> : null}
+                {!posts ? <LoadingView/> : null}
     
                 {posts === "empty" ?
                     <NoResults/> :
@@ -124,17 +107,17 @@ export default function Home({navigation}) {
                         showsVerticalScrollIndicator={false}
                         horizontal={false}
                         numColumns={2}
+                        refreshControl={
+                            <RefreshControl
+                            onRefresh={onRefresh}
+                            tintColor={"#fff"}
+                            colors={["#fff"]}
+                            />
+                        }
                     />
                 }
                         
             </View>
-            <PostModal
-                isOpen={modalVisible}
-                post={modalPost}
-                onClose={()=>{ setModalVisible(false); setModalPost(null); }}
-                onTapProfile={(id)=>{setModalVisible(false);navigation.navigate('ProfileOther', {id:id})}}
-                onReact={(postID, userID, i, set)=>{ reactionHanlder(postID, userID, i, set) }}
-            />
         </SafeAreaView>
     )
     

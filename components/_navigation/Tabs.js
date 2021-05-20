@@ -9,7 +9,7 @@ import {globalStyles} from './../../assets/styles/global.style'
 import Home from '../../screens/Home'
 import Search from '../../screens/Search'
 import Trending from '../../screens/Trending'
-import Profile from '../../screens/Profile'
+import Profile from '../../screens/Profile/Profile'
  
 const Tab = createBottomTabNavigator()
 export default function Tabs() {

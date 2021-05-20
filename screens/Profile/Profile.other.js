@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text, Image, SafeAreaView, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 
-import {logOutUser} from './../database/users.db'
+// import {logOutUser} from './../database/users.db'
 
 export default function ProfileOther({route, navigation}) {
     console.log(route.params);
