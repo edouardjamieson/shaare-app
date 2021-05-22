@@ -5,6 +5,7 @@ import {globalStyles} from '../../assets/styles/global.style'
 import {DefaultTheme} from '../../theme/default'
 
 import Header from '../../components/_header/Header'
+import ViewLoader from './../../components/_loaders/ViewLoader'
 import SinglePost from '../../components/_posts/SinglePost'
 
 import {getCachedUser, logOutUser} from '../../database/users.db'
@@ -44,18 +45,18 @@ export default function Profile({route, navigation}) {
         })
     }
 
-    if(isLoading) return null
-
+    
     // ====================================================================
     // Render posts
     // ====================================================================
     const renderPosts = ({item, index}) => {
         return <SinglePost
-            post={item}
-            onTap={()=>{ navigation.navigate('PostDetails', { post:item }) }}
-            onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
+        post={item}
+        onTap={()=>{ navigation.navigate('PostDetails', { post:item }) }}
+        onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
         />
     }
+    if(isLoading) return <ViewLoader />
 
     return (
         <SafeAreaView style={globalStyles.safeArea}>
@@ -78,13 +79,16 @@ export default function Profile({route, navigation}) {
 
                     <View style={styles.profile_header}>
                         <Image source={{uri: user.data.profilePicture}} style={styles.profilepicture} />
+                        <Text style={styles.username}>@{user.data.username}</Text>
                         <View style={{flexDirection:'row', alignItems:'center'}}>
                             <Text style={styles.handle}>{user.data.handle}</Text>
                             {user.data.role !== 'user' ?
-                                <Image source={user.data.role === 'validated' ? require(`./../../assets/images/icons/validated-icon.png`):require(`./../../assets/images/icons/admin-icon.png`)} style={[styles.special_icon, {tintColor: user.data.role === "validated" ? "blue" : DefaultTheme.colors.primary}]} />
+                                <Image source={user.data.role === 'validated' ? require(`./../../assets/images/icons/validated-icon.png`):require(`./../../assets/images/icons/admin-icon.png`)} style={[styles.special_icon, {tintColor: user.data.role === "validated" ? "#5352ed" : DefaultTheme.colors.primary}]} />
                             : null}   
-                            </View>
-                        <Text style={styles.username}>@{user.data.username}</Text>
+                        </View>
+                        
+                        {user.data.bio.length > 0 ? <View style={styles.bioContainer}><Text style={styles.bio}>{user.data.bio}</Text></View> : null}
+                        
                         <View style={styles.reactions}>
                             <Text style={styles.reaction}>{user.data.reactions[0]}</Text>
                             <Text style={styles.reaction}>{user.data.reactions[1]}</Text>
@@ -117,9 +121,9 @@ const styles = StyleSheet.create({
         marginTop:32
     },
     profilepicture: {
-        width:144,
-        height:144,
-        resizeMode:'contain',
+        width:172,
+        height:172,
+        resizeMode:'cover',
         borderRadius:360,
         borderWidth:3,
         borderColor:DefaultTheme.colors.primary,
@@ -138,9 +142,23 @@ const styles = StyleSheet.create({
         color:DefaultTheme.colors.whites.full,
     },
     username:{
+        marginBottom:8,
         fontFamily:DefaultTheme.fonts.medium,
         fontSize:DefaultTheme.fontSizes.normal,
         color:DefaultTheme.colors.whites.mid,
+    },
+    bioContainer: {
+        width:Dimensions.get('window').width - 64,
+        backgroundColor:DefaultTheme.colors.whites.quin,
+        borderRadius:15,
+        marginHorizontal:32,
+        padding:8,
+        marginTop:8
+    },
+    bio:{
+        fontFamily:DefaultTheme.fonts.medium,
+        fontSize:DefaultTheme.fontSizes.normal,
+        color:DefaultTheme.colors.whites.full,
     },
     reactions:{
         flexDirection:'row',

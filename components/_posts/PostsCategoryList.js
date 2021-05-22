@@ -67,7 +67,7 @@ export default function PostsCategoryList({ onChange }) {
 const styles = StyleSheet.create({
     list:{
         height:48,
-        paddingLeft:16,
+        paddingHorizontal:16,
         flexGrow:0,
         flexShrink:0
     },

@@ -1,14 +1,16 @@
 import React, {useEffect, useState, useCallback} from 'react'
 import {Text, View, SafeAreaView, FlatList, Alert, Modal, RefreshControl} from 'react-native'
+
+import ViewLoader from './../components/_loaders/ViewLoader'
 import Header from './../components/_header/Header'
 import {globalStyles} from '../assets/styles/global.style'
+import { DefaultTheme } from '../theme/default'
 
 import {getPosts} from './../database/posts.db'
 import {getCachedUser} from './../database/users.db'
 
 import PostsCategoryList from './../components/_posts/PostsCategoryList'
 import SinglePost from './../components/_posts/SinglePost'
-import { DefaultTheme } from '../theme/default'
 
 export default function Home({navigation}) {
 
@@ -77,17 +79,6 @@ export default function Home({navigation}) {
     }
 
     // ====================================================================
-    // Loading view
-    // ====================================================================
-    const LoadingView = () => {
-        return(
-            <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
-                <Text style={{ fontFamily:DefaultTheme.fonts.bold, color:DefaultTheme.colors.whites.full, fontSize:DefaultTheme.fontSizes.medium }}>Yikes! 😳</Text>
-            </View>
-        )
-    }
-
-    // ====================================================================
     // Render
     // ====================================================================
     return(
@@ -96,7 +87,7 @@ export default function Home({navigation}) {
                 <Header isShaareButtonVisible={true} onPressShaare={()=>{ navigation.navigate('Shaare') }}/>
                 <PostsCategoryList onChange={ (cat)=>{ changeCategory(cat.set_to) } }/>
 
-                {!posts ? <LoadingView/> : null}
+                {!posts ? <ViewLoader/> : null}
     
                 {posts === "empty" ?
                     <NoResults/> :

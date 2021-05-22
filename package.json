@@ -36,7 +36,8 @@
     "react-native-webview": "^11.4.3",
     "react-navigation": "^4.4.4",
     "react-navigation-stack": "^2.10.4",
-    "remove": "^0.1.5"
+    "remove": "^0.1.5",
+    "expo-image-picker": "~10.1.4"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"

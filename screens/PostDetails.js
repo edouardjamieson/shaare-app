@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview';
 import { DefaultTheme } from './../theme/default'
 import { Easing } from 'react-native-reanimated';
 
+import ActionSheet from './../components/_actions/ActionSheet'
 import {getCachedUser, savePost, followUser} from './../database/users.db'
 import {getSinglePost, reactToPost, deletePost} from './../database/posts.db'
 
@@ -55,12 +56,33 @@ export default function PostDetails({route, navigation}) {
     }
 
     // ====================================================================
+    // MODAL
+    // ====================================================================
+    const [actionSheetVisible, setActionSheetVisible] = useState(false)
+    const actionsHandler = (action) => {
+        
+        switch (action) {
+            case 'bookmark':
+                handleSavePost()
+                break;
+            case 'delete':
+                handleDelete()
+                break;
+            default:
+                setActionSheetVisible(false)
+                break;
+        }
+    }
+
+
+    // ====================================================================
     // Handle post saving
     // ====================================================================
     const handleSavePost = () => {
         let set = hasSavedPost === true ? false : true
         savePost(loggedUserID, post.post.id, set).then(()=>{
             setHasSavedPost(set)
+            setActionSheetVisible(false)
         })
     }
 
@@ -86,6 +108,7 @@ export default function PostDetails({route, navigation}) {
                 {text:"Do it!", style:"destructive", onPress:()=>{
                     deletePost(post.post.id)
                     .then((r)=> {
+                        setActionSheetVisible(false)
                         navigation.goBack()
                     })
                 }}
@@ -170,19 +193,16 @@ export default function PostDetails({route, navigation}) {
                     </TouchableOpacity>
 
                     <View style={styles.header_btns}>
-                        <TouchableOpacity onPress={()=>{handleSavePost()}} style={[styles.header_btn, { backgroundColor:hasSavedPost ? DefaultTheme.colors.primary : DefaultTheme.colors.whites.tier, }]}>
-                            <Image source={require('./../assets/images/icons/bookmark.png')} style={styles.header_btn_icon} />
-                        </TouchableOpacity>
                         {
-                            loggedUserID === post.user.id ?
-                            <TouchableOpacity onPress={()=>{handleDelete()}} style={[styles.header_btn, { backgroundColor:followsUser ? DefaultTheme.colors.primary : DefaultTheme.colors.whites.tier, }]}>
-                                <Image source={require('./../assets/images/icons/delete.png')} style={styles.header_btn_icon} />
-                            </TouchableOpacity>
-                            :
+                            loggedUserID !== post.user.id ?
                             <TouchableOpacity onPress={()=>{handleUserFollow()}} style={[styles.header_btn, { backgroundColor:followsUser ? DefaultTheme.colors.primary : DefaultTheme.colors.whites.tier, }]}>
                                 <Image source={require('./../assets/images/icons/follow_user.png')} style={styles.header_btn_icon} />
                             </TouchableOpacity>
+                            :null
                         }
+                        <TouchableOpacity onPress={()=>{setActionSheetVisible(true)}} style={[styles.header_btn, { backgroundColor: DefaultTheme.colors.whites.tier, }]}>
+                            <Image source={require('./../assets/images/icons/dots.png')} style={styles.header_btn_icon} />
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <Text style={styles.title}>{post.post.data.meta.content_title}</Text>
@@ -213,7 +233,6 @@ export default function PostDetails({route, navigation}) {
                                     </body>
                                 </html>
                             `}}
-                            // source={{html: post.post.data.meta.preview}}
                             style={styles.post_content}
                         />
                     </View>
@@ -222,6 +241,37 @@ export default function PostDetails({route, navigation}) {
 
                 {/* reactions */}
                 {hasReacted===null ? null : <GetReactions />}
+
+                {/* Action sheet */}
+                <ActionSheet for="post_details" isVisible={actionSheetVisible} dispatchAction={(action)=>{actionsHandler(action)}} content={
+                loggedUserID === post.user.id ? [
+                    {
+                        icon:require('./../assets/images/icons/bookmark.png'),
+                        title:hasSavedPost ? 'Remove from bookmarked posts' : 'Add to bookmarked posts',
+                        action:'bookmark'
+                    },
+                    {
+                        icon:require('./../assets/images/icons/delete.png'),
+                        title:'Delete this post',
+                        action:'delete'
+                    },
+                ]:[
+                    {
+                        icon:require('./../assets/images/icons/action_back.png'),
+                        title:'Shaare back',
+                        action:'shaare'
+                    },
+                    {
+                        icon:require('./../assets/images/icons/bookmark.png'),
+                        title:hasSavedPost ? 'Remove from bookmarked posts' : 'Add to bookmarked posts',
+                        action:'bookmark'
+                    },
+                    {
+                        icon:require('./../assets/images/icons/alert.png'),
+                        title:'Report this post',
+                        action:'report'
+                    },
+                ]} />
                 
             </SafeAreaView>
     )
@@ -341,7 +391,6 @@ const styles = StyleSheet.create({
     },
     reacted_icon:{
         fontSize:48,
-        // transform:[{translateY:"-70%"}]
     }
 
 })

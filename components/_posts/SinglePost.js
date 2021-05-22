@@ -1,5 +1,6 @@
 import React,{ useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback, Dimensions, ImageBackground, Linking } from 'react-native'
+import { DefaultTheme } from '../../theme/default'
 
 export default function SinglePost({post, onTap, onTapProfile}) {
     
@@ -67,7 +68,9 @@ const styles = StyleSheet.create({
         width:32,
         height:32,
         resizeMode:'cover',
-        borderRadius:100
+        borderRadius:100,
+        borderWidth:2,
+        borderColor:DefaultTheme.colors.primary
     },
     content_img:{
         width:32,

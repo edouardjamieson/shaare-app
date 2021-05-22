@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { View, Text, Image, SafeAreaView, TextInput, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Dimensions, Platform, FlatList } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
+import * as ImagePicker from 'expo-image-picker';
 
 import {updateUserInfos} from './../../database/users.db'
 import {checkIfContainsBadwords} from './../../badwords'
@@ -57,6 +58,22 @@ export default function EditProfile({route, navigation}) {
     const [userBio, setUserBio] = useState(user.data.bio || "")
 
     // ====================================================================
+    // Profile picture
+    // ====================================================================
+    const [hasPPchanged, setHasPPchanged] = useState(false)
+    const pickProfilePicture = async () => {
+        let pic = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: false
+        })
+        
+        if(!pic.cancelled) {
+            setUser({...user, data:{...user.data, profilePicture:pic.uri}})
+            setHasPPchanged(true)
+        }
+    }
+
+    // ====================================================================
     // Handle save content
     // ====================================================================
     const saveContent = () => {
@@ -70,7 +87,7 @@ export default function EditProfile({route, navigation}) {
         if(checkIfContainsBadwords(handle.toLowerCase())) return triggerError("Oups!", "We believe this user handle contains unsuitable words. Please try another.")
         if(checkIfContainsBadwords(bio.toLowerCase())) return triggerError("Oups!", "We believe your bio contains unsuitable words. Please try another.")
         
-        const data = {handle:handle, bio:bio, reactions:user.data.reactions}
+        const data = {handle:handle, bio:bio, reactions:user.data.reactions, profilePicture: hasPPchanged?user.data.profilePicture : ""}
         updateUserInfos(user.id, data)
         .then((result)=> {
             navigation.navigate('Profile', {refresh:true})
@@ -91,6 +108,10 @@ export default function EditProfile({route, navigation}) {
                 : null }
                 <ScrollView>
                     <SafeAreaView style={styles.container}>
+
+                        <TouchableOpacity style={styles.profilePictureBox} onPress={()=>{pickProfilePicture()}}>
+                            <Image source={{uri: user.data.profilePicture}} style={styles.profilePicture} />
+                        </TouchableOpacity>
 
                         <Text style={styles.edit_label}>My reactions</Text>
                         <View style={styles.swap_reactions}>
@@ -196,6 +217,17 @@ const styles = StyleSheet.create({
         backgroundColor:DefaultTheme.colors.dark,
         position:'relative',
         marginHorizontal:16,
+    },
+    profilePictureBox:{
+        width:'100%',
+        alignItems:'center',
+        marginVertical:16
+    },
+    profilePicture:{
+        width:150,
+        height:150,
+        resizeMode:'cover',
+        borderRadius:360
     },
     edit_label:{
         fontFamily:DefaultTheme.fonts.bold,

@@ -1,4 +1,4 @@
-import {db, vf} from './../firebase'
+import {db, vf, storage} from './../firebase'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SHA256 from 'crypto-js/sha256';
 
@@ -121,6 +121,7 @@ async function insertUser(data) {
     const user = {
         username:data.username,
         handle:data.username,
+        bio:"",
         password:password,
         created_at:date,
         is_ban:false,
@@ -169,14 +170,45 @@ async function followUser(followerID, followedID, set) {
 // UPDATE USER INFOS
 // ====================================================================
 async function updateUserInfos(userID, data) {
+    let UserPPurl
 
-    const query = await db.collection('users').doc(userID).update({
-        handle:data.handle,
-        bio:data.bio,
-        reactions:data.reactions
-    }).then(()=>{
-        updateCachedUser(userID)
-    })
+    if(data.profilePicture !== ""){
+        // console.log(data.profilePicture);
+        let type = data.profilePicture.split('.')
+        type = type[type.length-1]
+
+        fetch(data.profilePicture)
+        .then(res => {
+            return res.blob()
+        })
+        .then(blob => {
+            const ref = storage.ref()
+            const task = ref.child('profile_pictures/'+userID).put(blob, { contentType: `image/${type}` })
+            task.on('state_changed', ()=>{
+                task.snapshot.ref.getDownloadURL()
+                .then(url => {
+                    const query = db.collection('users').doc(userID).update({
+                        handle:data.handle,
+                        bio:data.bio,
+                        reactions:data.reactions,
+                        profilePicture:url
+                    }).then(()=>{
+                        updateCachedUser(userID)
+                    })
+                })
+            })
+        })
+
+    }else{
+        const query = await db.collection('users').doc(userID).update({
+            handle:data.handle,
+            bio:data.bio,
+            reactions:data.reactions,
+        }).then(()=>{
+            updateCachedUser(userID)
+        })
+    }
+
 
 }
 

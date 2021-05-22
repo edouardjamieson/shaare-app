@@ -5,6 +5,7 @@ import {getCachedUser} from './../../database/users.db'
 import {getPosts} from './../../database/posts.db'
 
 import SinglePost from './../../components/_posts/SinglePost'
+import ViewLoader from './../../components/_loaders/ViewLoader'
 
 import {globalStyles} from '../../assets/styles/global.style'
 import {DefaultTheme} from '../../theme/default'
@@ -40,17 +41,6 @@ export default function Bookmarked({navigation}) {
     }
 
     // ====================================================================
-    // Loading view
-    // ====================================================================
-    const LoadingView = () => {
-        return(
-            <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
-                <Text style={{ fontFamily:DefaultTheme.fonts.bold, color:DefaultTheme.colors.whites.full, fontSize:DefaultTheme.fontSizes.medium }}>loading...</Text>
-            </View>
-        )
-    }
-
-    // ====================================================================
     // No results view
     // ====================================================================
     const NoResults = () => {
@@ -64,7 +54,7 @@ export default function Bookmarked({navigation}) {
 
     return (
         <SafeAreaView style={styles.container}>
-            {!posts ? <LoadingView/> : null}
+            {!posts ? <ViewLoader/> : null}
             {posts === "empty" ?
                 <NoResults/> :
                 <FlatList 

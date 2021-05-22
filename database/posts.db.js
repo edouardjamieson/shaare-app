@@ -20,11 +20,11 @@ async function getPosts(data) {
         case "none":
             posts_doc = await posts.get()
             break;
-        case "category":
-            posts_doc = await posts.where("category","==",category).get()
-            break;
         case "singleUser":
             posts_doc = await posts.where("author", "==", callerID).get()
+            break;
+        case category:
+            posts_doc = await posts.where("category","==",category).get()
             break;
         default:
             return 0
