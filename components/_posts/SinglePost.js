@@ -1,8 +1,12 @@
 import React,{ useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback, Dimensions, ImageBackground, Linking } from 'react-native'
+import CachedImage from 'react-native-expo-cached-image';
 import { DefaultTheme } from '../../theme/default'
 
-export default function SinglePost({post, onTap, onTapProfile}) {
+export default function SinglePost({post, onTap, onTapProfile, profileBtnVisible}) {
+
+    const [profileImgLoaded, setProfileImgLoaded] = useState(false)
+    if(!profileBtnVisible && profileBtnVisible !== false) profileBtnVisible = true
     
     return (
         <View style={styles.container}>
@@ -11,12 +15,15 @@ export default function SinglePost({post, onTap, onTapProfile}) {
                 <TouchableWithoutFeedback onPress={()=>{ onTap() }} onLongPress={()=> { Linking.openURL(post.post.data.meta.link_url) }}>
                     <View style={styles.content}>
                         <View style={styles.content_footer}>
+                            {profileBtnVisible ?
                             <TouchableOpacity style={styles.content_headerBtn} onPress={()=>{ onTapProfile(post.user.id) }}>
-                                <Image
+                                <CachedImage
                                     source={{uri:post.user.data.profilePicture}}
-                                    style={styles.content_profileImg}
+                                    style={[styles.content_profileImg, {opacity: profileImgLoaded ? 1:0}]}
+                                    onLoadEnd={()=> { setProfileImgLoaded(true) }}
                                 />
-                            </TouchableOpacity>
+                                
+                            </TouchableOpacity>:null}
                             {/* <Image source={{uri:post.data.meta.provider_img}} style={styles.content_img} /> */}
                         </View>
                     </View>

@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { View, Text, Image, SafeAreaView, TextInput, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList, RefreshControl } from 'react-native'
+import CachedImage from 'react-native-expo-cached-image';
 
 import {globalStyles} from '../../assets/styles/global.style'
 import {DefaultTheme} from '../../theme/default'
@@ -54,6 +55,7 @@ export default function Profile({route, navigation}) {
         post={item}
         onTap={()=>{ navigation.navigate('PostDetails', { post:item }) }}
         onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
+        profileBtnVisible={false}
         />
     }
     if(isLoading) return <ViewLoader />
@@ -78,7 +80,8 @@ export default function Profile({route, navigation}) {
                 }>
 
                     <View style={styles.profile_header}>
-                        <Image source={{uri: user.data.profilePicture}} style={styles.profilepicture} />
+                        {/* <Image source={{uri: user.data.profilePicture}} style={styles.profilepicture} /> */}
+                        <CachedImage source={{uri: user.data.profilePicture}} style={styles.profilepicture} />
                         <Text style={styles.username}>@{user.data.username}</Text>
                         <View style={{flexDirection:'row', alignItems:'center'}}>
                             <Text style={styles.handle}>{user.data.handle}</Text>

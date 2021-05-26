@@ -3,6 +3,7 @@ import { Alert, StyleSheet, Text, View, Image, TouchableOpacity, Animated, SafeA
 import { WebView } from 'react-native-webview';
 import { DefaultTheme } from './../theme/default'
 import { Easing } from 'react-native-reanimated';
+import CachedImage from 'react-native-expo-cached-image';
 
 import ActionSheet from './../components/_actions/ActionSheet'
 import {getCachedUser, savePost, followUser} from './../database/users.db'
@@ -186,7 +187,7 @@ export default function PostDetails({route, navigation}) {
                 {/* header */}
 
                 <View style={styles.header}>
-                    <Image style={styles.user_pic} source={{uri:post.user.data.profilePicture}}/>
+                    <CachedImage style={styles.user_pic} source={{uri:post.user.data.profilePicture}}/>
                     <TouchableOpacity style={styles.user_names} onPress={()=>{ navigation.navigate('ProfileOther', {id:post.user.id}) }}>
                         <Text style={styles.user_handle}>{post.user.data.handle}</Text>
                         <Text style={styles.user_username}>@{post.user.data.username}</Text>
@@ -243,35 +244,48 @@ export default function PostDetails({route, navigation}) {
                 {hasReacted===null ? null : <GetReactions />}
 
                 {/* Action sheet */}
-                <ActionSheet for="post_details" isVisible={actionSheetVisible} dispatchAction={(action)=>{actionsHandler(action)}} content={
-                loggedUserID === post.user.id ? [
-                    {
-                        icon:require('./../assets/images/icons/bookmark.png'),
-                        title:hasSavedPost ? 'Remove from bookmarked posts' : 'Add to bookmarked posts',
-                        action:'bookmark'
-                    },
-                    {
-                        icon:require('./../assets/images/icons/delete.png'),
-                        title:'Delete this post',
-                        action:'delete'
-                    },
-                ]:[
-                    {
-                        icon:require('./../assets/images/icons/action_back.png'),
-                        title:'Shaare back',
-                        action:'shaare'
-                    },
-                    {
-                        icon:require('./../assets/images/icons/bookmark.png'),
-                        title:hasSavedPost ? 'Remove from bookmarked posts' : 'Add to bookmarked posts',
-                        action:'bookmark'
-                    },
-                    {
-                        icon:require('./../assets/images/icons/alert.png'),
-                        title:'Report this post',
-                        action:'report'
-                    },
-                ]} />
+                <ActionSheet isVisible={actionSheetVisible} dispatchAction={(action)=>{actionsHandler(action)}}
+                content={
+                    loggedUserID === post.user.id ? [
+                        {
+                            icon:require('./../assets/images/icons/bookmark.png'),
+                            title:hasSavedPost ? 'Remove from bookmarked posts' : 'Add to bookmarked posts',
+                            action:'bookmark'
+                        },
+                        {
+                            icon:require('./../assets/images/icons/delete.png'),
+                            title:'Delete this post',
+                            action:'delete'
+                        },
+                    ]:[
+                        {
+                            icon:require('./../assets/images/icons/action_back.png'),
+                            title:'Shaare back',
+                            action:'shaare'
+                        },
+                        {
+                            icon:require('./../assets/images/icons/bookmark.png'),
+                            title:hasSavedPost ? 'Remove from bookmarked posts' : 'Add to bookmarked posts',
+                            action:'bookmark'
+                        },
+                        {
+                            icon:require('./../assets/images/icons/alert.png'),
+                            title:'Report this post',
+                            action:'report'
+                        },
+                    ]}
+                uniqueContent={
+                    loggedUserID === post.user.id ? {type:'reactions', content:post.user.data.reactions.map((r, x) => {
+                        return {
+                            reaction:r,
+                            occurence:post.post.data.reactions.filter(f => f.reaction_index === x).length
+                        }
+                    })}:null
+                }
+                
+
+                
+                />
                 
             </SafeAreaView>
     )

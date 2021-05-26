@@ -2,7 +2,7 @@ import React from 'react'
 import {View, Text, Image, SafeAreaView, Modal, StyleSheet, TouchableOpacity} from 'react-native'
 import { DefaultTheme } from '../../theme/default'
 
-export default function ActionSheet({isVisible, content, dispatchAction}) {
+export default function ActionSheet({isVisible, uniqueContent, content, dispatchAction}) {
 
 
     const Actions = () => {
@@ -15,6 +15,30 @@ export default function ActionSheet({isVisible, content, dispatchAction}) {
             </TouchableOpacity>)
         })
         return actions
+    }
+
+    const SpecialContent = () => {
+
+        if(!uniqueContent) return null
+        const content = []
+
+        if(uniqueContent.type === "reactions"){
+            uniqueContent.content.map((c, x)=>{
+                content.push(
+                    <View style={styles.reaction} key={x}>
+                        <Text style={styles.r_icon}>{c.reaction}</Text>
+                        <Text style={styles.r_count}>{c.occurence}</Text>
+                    </View>
+                )
+            })
+        }
+        
+        return (
+            <View style={styles.specialContent}>
+                {content}
+            </View>
+        )
+
     }
 
     return (
@@ -30,6 +54,7 @@ export default function ActionSheet({isVisible, content, dispatchAction}) {
                 <View style={styles.header}>
                     <Text style={styles.title}>More</Text>
                 </View>
+                <SpecialContent/>
                 <Actions/>
 
             </SafeAreaView>
@@ -84,6 +109,27 @@ const styles = StyleSheet.create({
         fontFamily:DefaultTheme.fonts.medium,
         fontSize:DefaultTheme.fontSizes.normal,
         marginLeft:16
+    },
+
+    specialContent: {
+        width:"100%",
+        flexDirection:'row',
+        alignItems:'center',
+        paddingHorizontal:16,
+        marginBottom:16,
+        justifyContent:'space-between',
+        marginBottom:32
+    },
+    reaction: {
+        alignItems:'center'
+    },
+    r_icon: {
+        fontSize:48
+    },
+    r_count: {
+        color:DefaultTheme.colors.whites.full,
+        fontFamily:DefaultTheme.fonts.bold,
+        fontSize:DefaultTheme.fontSizes.normal,
     }
 
 
