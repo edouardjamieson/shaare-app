@@ -1,10 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import React, {useState, useRef} from 'react'
-import {View, Text, Image, SafeAreaView, StyleSheet, StatusBar, Animated, TextInput, ScrollView, KeyboardAvoidingView, Platform, Dimensions} from 'react-native'
+import {View, Text, Image, SafeAreaView, StyleSheet, StatusBar, Animated, TextInput, ScrollView, KeyboardAvoidingView, Platform, Dimensions, TouchableOpacity} from 'react-native'
 import { Easing } from 'react-native-reanimated';
-import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import {DefaultTheme} from './../theme/default'
+import ViewLoader from './../components/_loaders/ViewLoader'
+import Onboarding from './../components/_login/Onboarding'
+import Form from './../components/_login/Form'
+
 import {checkIfContainsBadwords} from './../badwords'
 import {insertUser, logInUser} from './../database/users.db'
 import {validateCode} from './../database/codes.db'
@@ -14,6 +17,7 @@ export default function Login({ onLogin }) {
     const [screen, setScreen] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(null)
+    const [formContent, setFormContent] = useState('login')
 
     // ====================================================================
     // Animations
@@ -149,11 +153,6 @@ export default function Login({ onLogin }) {
             />
             <SafeAreaView style={styles.safe}>
 
-                {/* LOADING */}
-                <View style={[styles.loader, {display: isLoading?"flex":"none"}]}>
-                    <Image source={require('./../assets/images/loading.gif')} style={{width:48,height:48,resizeMode:'contain',borderRadius:100}} />
-                </View>
-
                 {/* ERROR */}
                 <Animated.View style={{opacity:viewError, display: error?"flex":"none", zIndex:10}}>
                     <LinearGradient style={form.error} colors={DefaultTheme.colors.errorGradientArray}>
@@ -163,41 +162,26 @@ export default function Login({ onLogin }) {
 
                 {/* ONBOARDING 1 */}
                 <Animated.View style={[styles.page, {display:screen === 0 ? "flex":"none"} ]}>
-                    <View style={styles.header}>
-                        <Image source={require('./../assets/images/logo.png')} style={styles.logo} />
-                    </View>
-                    <View style={styles.content}>
-                        <Image source={require('./../assets/images/onboarding1.png')} style={onboarding.image} />
-                        <Text style={onboarding.title}>Share what you really like.</Text>
-                        <Text style={onboarding.text}>Videos, photos, music, products, anything. Just Shaare.</Text>
-                    </View>
-                    <View style={styles.footer}>
-                        <TouchableOpacity style={styles.button} onPress={()=>{ nextStep() }}>
-                            <LinearGradient colors={DefaultTheme.colors.mainGradientArray} style={styles.gradient}>
-                                <Text style={styles.button_text}>Next</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
+                    <Onboarding
+                        image={require('./../assets/images/onboarding1.png')}
+                        title="Share what you really like."
+                        desc="Videos, photos, music, products, anything. Just Shaare."
+                        primaryBtn={{ title: "Next", action:()=>{nextStep()} }}
+                        secondaryBtn={{ title: "Login", action:()=>{nextStep(3)} }}
+                    />
                 </Animated.View>
 
                 {/* ONBOARDING 2 */}
                 <Animated.View style={[styles.page, {display:screen === 1 ? "flex":"none", left:viewLeft } ]}>
-                    <View style={styles.header}>
-                        <Image source={require('./../assets/images/logo.png')} style={styles.logo} />
-                    </View>
-                    <View style={styles.content}>
-                        <Image source={require('./../assets/images/onboarding2.png')} style={onboarding.image} />
-                        <Text style={onboarding.title}>Discover what others are into.</Text>
-                        <Text style={onboarding.text}>See what people watch, listen to, laught to and interact with them.</Text>
-                    </View>
-                    <View style={styles.footer}>
-                        <TouchableOpacity style={styles.button} onPress={()=>{ nextStep() }}>
-                            <LinearGradient colors={DefaultTheme.colors.mainGradientArray} style={styles.gradient}>
-                                <Text style={styles.button_text}>Next</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
+                    <Onboarding
+                        image={require('./../assets/images/onboarding2.png')}
+                        title="Discover what others are into."
+                        desc="See what people watch, listen to, laught to and interact with them."
+                        primaryBtn={{ title: "Next", action:()=>{nextStep()} }}
+                    />
                 </Animated.View>
+
+                <Form view={formContent}/>
 
                 {/* INVITE CODE */}
                 <Animated.View style={[styles.page, {display:screen === 2 ? "flex":"none", left:viewLeft } ]}>
@@ -435,8 +419,8 @@ const styles = StyleSheet.create({
     },
     gradient:{
         width:"100%",
-        paddingVertical:6,
-        paddingHorizontal:20,
+        paddingVertical:8,
+        paddingHorizontal:24,
     },
     button_text:{
         fontFamily:DefaultTheme.fonts.bold,
@@ -451,7 +435,7 @@ const styles = StyleSheet.create({
     fill:{
         backgroundColor:DefaultTheme.colors.whites.quin,
         width:"100%",
-        paddingVertical:6,
+        paddingVertical:8,
         paddingHorizontal:20,
     },
     button_second_text:{
