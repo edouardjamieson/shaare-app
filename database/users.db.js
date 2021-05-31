@@ -79,7 +79,7 @@ async function updateCachedUser(userID) {
 async function getUserById(id) {
     const user = await db.collection('users').doc(id).get()
     if(user.empty) return 0
-    return user.data()
+    return {id:user.id, data:user.data()}
 }
 
 // ====================================================================

@@ -10,7 +10,9 @@ import {checkIfContainsBadwords} from './../badwords'
 import {insertPost} from './../database/posts.db'
 import {getCachedUser} from './../database/users.db'
 
-export default function Shaare({navigation}) {
+export default function Shaare({route, navigation}) {
+    
+    const shaareback = route.params ? route.params.post : null
 
     // ====================================================================
     // Validate
@@ -113,21 +115,19 @@ export default function Shaare({navigation}) {
     // ====================================================================
     // Inputs string
     // ====================================================================
-    const [urlString, setUrlString] = useState("")
-    const [keyString, setKeyString] = useState("")
+    const [urlString, setUrlString] = useState(shaareback ? shaareback.post.data.meta.link_url : "")
+    const [keyString, setKeyString] = useState(shaareback ? shaareback.post.data.keyword : "")
     
     // ====================================================================
     // Get random greetings text
     // ====================================================================
 
-    const words = ["funny 😂", "cool 😎", "romantic ❤️", "weird 🦑", "sporty 🏈", "cute 🥰", "you like 👌"]
+    const words = ["funny 😂", "cool 😎", "romantic ❤️", "weird 🦑", "sporty 🏈", "cute 🥰", "you like 👌", "exciting 🤩"]
     const [currentWord, setCurrentWord] = useState(Math.floor(Math.random() * words.length))
 
     // ====================================================================
     // Category list
     // ====================================================================
-
-    const [currentCategory, setCurrentCategory] = useState(0)
     const category = [
         {
             name:"Music",
@@ -160,6 +160,7 @@ export default function Shaare({navigation}) {
             icon:require('./../assets/images/icons/website.png')
         },
     ]
+    const [currentCategory, setCurrentCategory] = useState(shaareback ? category.indexOf(category.find(c => c.set_to === shaareback.post.data.category)):0)
 
     const RenderCategoryItem = ({item, index}) => {
         return(

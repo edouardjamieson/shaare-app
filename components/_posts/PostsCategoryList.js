@@ -7,7 +7,11 @@ export default function PostsCategoryList({ onChange }) {
     const category = [
         {
             name:"For me",
-            set_to:"none"
+            set_to:"forme"
+        },
+        {
+            name:"Random",
+            set_to:"random"
         },
         {
             name:"Music",

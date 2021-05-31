@@ -1,4 +1,5 @@
 import {db, vf} from './../firebase'
+import {getEquation} from './equation.db'
 
 // ====================================================================
 // GET POST LIST
@@ -6,9 +7,10 @@ import {db, vf} from './../firebase'
 async function getPosts(data) {
 
     const category = data.category || ""
-    const equation = data.equation || ""
     const callerID = data.callerID || ""
 
+    let eq
+    getEquation().then(val => {eq = val})
 
     const posts = db.collection('posts')
     const users = await db.collection('users').get()
@@ -17,8 +19,11 @@ async function getPosts(data) {
     switch (category) {
         case "":
             break;
-        case "none":
-            posts_doc = await posts.get()
+        case "forme":
+            posts_doc = await posts.where('author', '!=', callerID).get()
+            break;
+        case "random":
+            posts_doc = await posts.where('author', '!=', callerID).get()
             break;
         case "singleUser":
             posts_doc = await posts.where("author", "==", callerID).get()
@@ -32,17 +37,53 @@ async function getPosts(data) {
     }
 
     if(!posts_doc.empty){
+        if(category !== "singleUser" && category !== "random"){
 
-        return posts_doc.docs.map((doc)=>({
-            post:{
-                id:doc.id,
-                data:doc.data()
-            },
-            user:{
-                id:doc.data().author,
-                data:users.docs.filter(u => u.id === doc.data().author)[0].data()
+            const posts = posts_doc.docs.map((doc)=>({
+                post:{
+                    id:doc.id,
+                    data:doc.data()
+                },
+                user:{
+                    id:doc.data().author,
+                    data:users.docs.filter(u => u.id === doc.data().author)[0].data()
+                }
+            }))
+            
+            //get all posts where keyword is in EQ
+            const filtered = posts.filter(p => {
+                return eq.some(e => e.key === p.post.data.keyword.trim().toLowerCase().split(" ").join(""))
+            })
+            //order posts depending on keyword points
+            const ordered = Object.entries(filtered).sort((a,b) => {
+                const p1 = eq.find(e => e.key === a[1].post.data.keyword.trim().toLowerCase().split(" ").join(""))
+                const p2 = eq.find(e => e.key === b[1].post.data.keyword.trim().toLowerCase().split(" ").join(""))
+                if(p1.points > p2.points) return -1
+                if(p1.points < p2.points) return 1
+                if(p1.points == p2.points) return 0
+            })
+            //return in the right format
+            const returned = [] 
+            for (let i = 0; i < ordered.length; i++) {
+                const container = ordered[i];
+                const post = container[1]
+                returned.push(post)                
             }
-        }))
+            return returned
+
+        }else{
+            return posts_doc.docs.map((doc)=>({
+                post:{
+                    id:doc.id,
+                    data:doc.data()
+                },
+                user:{
+                    id:doc.data().author,
+                    data:users.docs.filter(u => u.id === doc.data().author)[0].data()
+                }
+            }))
+        }
+
 
 
     }

@@ -9,7 +9,7 @@ import Header from '../../components/_header/Header'
 import ViewLoader from './../../components/_loaders/ViewLoader'
 import SinglePost from '../../components/_posts/SinglePost'
 
-import {getCachedUser, logOutUser} from '../../database/users.db'
+import {getCachedUser, getUserById, logOutUser} from '../../database/users.db'
 import {getPosts} from '../../database/posts.db.js'
 
 export default function Profile({route, navigation}) {
@@ -80,8 +80,7 @@ export default function Profile({route, navigation}) {
                 }>
 
                     <View style={styles.profile_header}>
-                        {/* <Image source={{uri: user.data.profilePicture}} style={styles.profilepicture} /> */}
-                        <CachedImage source={{uri: user.data.profilePicture}} style={styles.profilepicture} />
+                        <Image source={{uri: user.data.profilePicture}} style={styles.profilepicture} />
                         <Text style={styles.username}>@{user.data.username}</Text>
                         <View style={{flexDirection:'row', alignItems:'center'}}>
                             <Text style={styles.handle}>{user.data.handle}</Text>

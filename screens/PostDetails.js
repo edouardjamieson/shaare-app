@@ -8,6 +8,7 @@ import CachedImage from 'react-native-expo-cached-image';
 import ActionSheet from './../components/_actions/ActionSheet'
 import {getCachedUser, savePost, followUser} from './../database/users.db'
 import {getSinglePost, reactToPost, deletePost} from './../database/posts.db'
+import {updateEquation} from './../database/equation.db'
 
 export default function PostDetails({route, navigation}) {
 
@@ -54,6 +55,7 @@ export default function PostDetails({route, navigation}) {
             set === true ? setHasReacted({uid:loggedUserID, reaction_index:i}):setHasReacted(0)
             setReactBtnDisabled(false)
         })
+        updateEquation(post.post.data.keyword, set == true ? 2 : -1)
     }
 
     // ====================================================================
@@ -68,6 +70,9 @@ export default function PostDetails({route, navigation}) {
                 break;
             case 'delete':
                 handleDelete()
+                break;
+            case 'shaare':
+                navigation.navigate('Shaare', {post:post})
                 break;
             default:
                 setActionSheetVisible(false)
@@ -85,6 +90,11 @@ export default function PostDetails({route, navigation}) {
             setHasSavedPost(set)
             setActionSheetVisible(false)
         })
+
+        //EQ
+        if(loggedUserID !== post.user.id){
+            updateEquation(post.post.data.keyword, set == true ? 2 : -2)
+        }
     }
 
     // ====================================================================
@@ -187,7 +197,7 @@ export default function PostDetails({route, navigation}) {
                 {/* header */}
 
                 <View style={styles.header}>
-                    <CachedImage style={styles.user_pic} source={{uri:post.user.data.profilePicture}}/>
+                    <Image style={styles.user_pic} source={{uri:post.user.data.profilePicture, cache:'force-cache'}}/>
                     <TouchableOpacity style={styles.user_names} onPress={()=>{ navigation.navigate('ProfileOther', {id:post.user.id}) }}>
                         <Text style={styles.user_handle}>{post.user.data.handle}</Text>
                         <Text style={styles.user_username}>@{post.user.data.username}</Text>

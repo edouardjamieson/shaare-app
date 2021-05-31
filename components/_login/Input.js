@@ -1,8 +1,9 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {Text, View, TextInput, Image, StyleSheet} from 'react-native'
 import { DefaultTheme } from '../../theme/default'
 
 export default function Input({label, icon, value, onChange, placeholder, password}) {
+    const [val, setVal] = useState(value)
     return (
         <View style={styles.container}>
         <Text style={styles.label}>{label}</Text>
@@ -10,8 +11,9 @@ export default function Input({label, icon, value, onChange, placeholder, passwo
                 <Image source={icon} style={styles.inputimg} />
                 <TextInput
                     style={styles.input}
-                    // value={log_username}
-                    // onChangeText={setLog_username}
+                    value={val}
+                    onChangeText={v => setVal(v)}
+                    onEndEditing={(e)=>{ onChange(val); }}
                     autoCompleteType="off"
                     autoFocus={false}
                     placeholderTextColor={DefaultTheme.colors.whites.mid}

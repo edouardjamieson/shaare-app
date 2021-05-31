@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react'
-import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, ScrollView, Alert, Image } from 'react-native'
 
 import {getCachedUser, logOutUser} from './../../database/users.db'
+import {resetEquation, DEV_getEQ} from './../../database/equation.db'
 
 import {DefaultTheme} from '../../theme/default'
 
@@ -44,16 +45,57 @@ export default function Settings({navigation}) {
         .then(()=> navigation.navigate('Logout'))
     }
 
+    // ====================================================================
+    // Handle reset EQ
+    // ====================================================================
+    const resetEQ = () => {
+        Alert.alert(
+            "You're about to reset your preferences!",
+            "Your posts feed preferences will be reset. There is no going back.",
+            [
+                {text:"Never mind", style:"cancel"},
+                {text:"Do it!", style:"destructive", onPress:()=>{
+                    resetEquation()
+                    .then(()=>{
+                        Alert.alert("Your feed preferences have been reset.", "", [{ text:"OK" }])
+                    })
+                }}
+            ]
+        )
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView>
 
                 <View style={styles.option}>
-                    <TouchableOpacity onPress={()=> { handleLogOut() }}>
+                    <TouchableOpacity style={styles.option_btn} onPress={()=> { handleLogOut() }}>
+                        <Image style={styles.option_img} source={require('./../../assets/images/icons/logout.png')}></Image>
                         <Text style={styles.option_text}>Log out</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={()=> { handleLogOutDEV() }}>
+                </View>
+                <View style={styles.option}>
+                    <TouchableOpacity style={styles.option_btn} onPress={()=> { handleLogOutDEV() }}>
+                        <Image style={styles.option_img} source={require('./../../assets/images/icons/logout.png')}></Image>
                         <Text style={styles.option_text}>Log out DEV</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.option}>
+                    <TouchableOpacity style={styles.option_btn} onPress={()=> { resetEQ() }}>
+                        <Image style={styles.option_img} source={require('./../../assets/images/icons/reset_eq.png')}></Image>
+                        <Text style={styles.option_text}>Reset preferences</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.option}>
+                    <TouchableOpacity style={styles.option_btn} onPress={()=> { resetEquation() }}>
+                        <Image style={styles.option_img} source={require('./../../assets/images/icons/reset_eq.png')}></Image>
+                        <Text style={styles.option_text}>Reset preferences DEV</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.option}>
+                    <TouchableOpacity style={styles.option_btn} onPress={()=> { DEV_getEQ() }}>
+                        <Image style={styles.option_img} source={require('./../../assets/images/icons/reset_eq.png')}></Image>
+                        <Text style={styles.option_text}>DEV Get preferences</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -75,7 +117,18 @@ const styles = StyleSheet.create({
         borderBottomColor:DefaultTheme.colors.whites.tier,
         borderBottomWidth:1,
         paddingHorizontal:16,
-        paddingVertical:8
+        paddingVertical:16,
+    },
+    option_btn:{
+        flexDirection:'row',
+        alignItems:'center'
+    },
+    option_img:{
+        height:24,
+        width:24,
+        resizeMode:'contain',
+        tintColor:DefaultTheme.colors.primary,
+        marginRight:8
     },
     option_text:{
         color:DefaultTheme.colors.whites.full,

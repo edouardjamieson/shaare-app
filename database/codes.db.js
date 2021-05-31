@@ -34,8 +34,8 @@ async function generateCode() {
 // ====================================================================
 async function validateCode(code) {
 
-    const codeExists = await db.collection('codes').where('code', '==', code).where('used', '==', false).get()
-    if(codeExists.empty) return 0
+    const query = await db.collection('codes').where('code', '==', code).where('used', '==', false).get()
+    if(query.empty) return 0
     return 1
 
 }

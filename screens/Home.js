@@ -15,17 +15,19 @@ import SinglePost from './../components/_posts/SinglePost'
 export default function Home({navigation}) {
 
     const [posts, setPosts] = useState(null)
-    const [category, setCategory] = useState("none")
+    const [category, setCategory] = useState("forme")
     
     // ====================================================================
     // Builds posts list after render
     // ====================================================================
     useEffect(() => {
         if(!posts){
-            getPosts({category:category})
-            .then((docs)=>{
-                setPosts(docs)
-            }) 
+            getCachedUser().then(val => {
+                getPosts({category:category, callerID:val.id})
+                .then((docs)=>{
+                    docs.length > 0 ? setPosts(docs) : setPosts("empty")
+                }) 
+            })
         }
 
         getCachedUser().then(val => {console.log(`Currently logged has ${val.data.handle} (@${val.data.username})`)})
@@ -35,23 +37,27 @@ export default function Home({navigation}) {
     // Builds posts list on category change
     // ====================================================================
     const changeCategory = (cat) => {
+        setPosts(null)
         setCategory(cat)
-        getPosts({category:cat})
-        .then((docs)=>{
-            docs ? setPosts(docs) : setPosts("empty")
-            
-        }) 
+        getCachedUser().then(val => {
+            getPosts({category:cat, callerID:val.id})
+            .then((docs)=>{
+                docs.length > 0 ? setPosts(docs) : setPosts("empty")
+            }) 
+        })
     }
 
     // ====================================================================
     // On refresh
     // ====================================================================
     const onRefresh = () => {
-        getPosts({category:category})
-        .then((docs)=>{
-            docs ? setPosts(docs) : setPosts("empty")
-            
-        }) 
+        setPosts(null)
+        getCachedUser().then(val => {
+            getPosts({category:category, callerID:val.id})
+            .then((docs)=>{
+                docs.length > 0 ? setPosts(docs) : setPosts("empty")
+            }) 
+        })
     }
     
 
