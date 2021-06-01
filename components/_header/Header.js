@@ -3,7 +3,7 @@ import {Image, View, StyleSheet, TouchableOpacity, Text} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import {DefaultTheme} from './../../theme/default'
 
-export default function Header({isShaareButtonVisible, onPressShaare, areProfileButtonsVisible, areProfileOtherButtonsVisible, onProfileAction}) {
+export default function Header({isShaareButtonVisible, onPressShaare, areProfileButtonsVisible, onProfileAction}) {
 
     return (
         <View style={styles.header}>
@@ -29,14 +29,6 @@ export default function Header({isShaareButtonVisible, onPressShaare, areProfile
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{ onProfileAction('Settings') }} style={styles.profile_button}>
                     <Image source={require('./../../assets/images/icons/settings.png')} style={styles.profile_btn_icon} />
-                </TouchableOpacity>
-            </View>
-            : null}
-
-            {areProfileOtherButtonsVisible === true ?
-            <View style={styles.profile_btns}>
-                <TouchableOpacity onPress={()=>{ onProfileAction('Report') }} style={styles.profile_button}>
-                    <Image source={require('./../../assets/images/icons/alert.png')} style={styles.profile_btn_icon} />
                 </TouchableOpacity>
             </View>
             : null}

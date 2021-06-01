@@ -114,8 +114,6 @@ const styles = StyleSheet.create({
     },
 
     option:{
-        borderBottomColor:DefaultTheme.colors.whites.tier,
-        borderBottomWidth:1,
         paddingHorizontal:16,
         paddingVertical:16,
     },

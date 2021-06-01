@@ -72,7 +72,12 @@ export default function PostDetails({route, navigation}) {
                 handleDelete()
                 break;
             case 'shaare':
+                setActionSheetVisible(false)
                 navigation.navigate('Shaare', {post:post})
+                break;
+            case 'report':
+                setActionSheetVisible(false)
+                navigation.navigate('Report', {type:'post', content:post})
                 break;
             default:
                 setActionSheetVisible(false)

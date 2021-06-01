@@ -20,6 +20,7 @@ import ProfileOther from './screens/Profile/Profile.other'
 import Bookmarked from './screens/Profile/Profile.bookmarked'
 import EditProfile from './screens/Profile/Profile.edit'
 import Settings from './screens/Profile/Profile.settings'
+import Report from './screens/Report'
 
 const Stack = createStackNavigator()
 export default function App() {
@@ -69,7 +70,17 @@ export default function App() {
               <Stack.Screen name="PostDetails" component={PostDetails}/>
               <Stack.Screen name="Shaare" component={Shaare}/>
               {/* Profile Screens */}
-              <Stack.Screen name="ProfileOther" component={ProfileOther}/>
+              <Stack.Screen name="ProfileOther" component={ProfileOther} options={{
+                headerShown:true,
+                headerTitle:"",
+                headerBackTitle:'Back',
+                headerBackTitleStyle:{
+                  color:DefaultTheme.colors.whites.full,
+                  fontFamily:DefaultTheme.fonts.bold,
+                  marginLeft:8
+                },
+                headerTintColor:DefaultTheme.colors.primary
+              }}/>
               <Stack.Screen name="Bookmarked" component={Bookmarked} options={{
                 headerTitle:'Bookmarked 📒',
                 ...profilePageOptions
@@ -83,6 +94,10 @@ export default function App() {
                 ...profilePageOptions
               }}/>
               <Stack.Screen name="Logout" component={Logout}/>
+              <Stack.Screen name="Report" component={Report} options={{
+                headerTitle:'Report something❗️',
+                ...profilePageOptions
+              }}/>
 
             </Stack.Navigator>
   
