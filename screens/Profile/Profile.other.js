@@ -54,6 +54,9 @@ export default function ProfileOther({route, navigation}) {
             case 'block':
                 handleDelete()
                 break;
+            case 'exit':
+                setActionSheetVisible(false)
+                break;
             default:
                 setActionSheetVisible(false)
                 break;

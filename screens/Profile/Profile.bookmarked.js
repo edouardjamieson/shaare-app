@@ -19,7 +19,7 @@ export default function Bookmarked({navigation}) {
     useEffect(() => {
         getCachedUser().then(val => {      
             const saved = val.data.saved
-            getPosts({category:"none"})
+            getPosts({category:"all"})
             .then(docs => {
                 const savedposts = docs.filter(d => saved.includes(d.post.id))
                 savedposts.length > 0 ? setPosts(savedposts) : setPosts("empty")

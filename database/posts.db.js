@@ -19,6 +19,9 @@ async function getPosts(data) {
     switch (category) {
         case "":
             break;
+        case "all":
+            posts_doc = await posts.get()
+            break;
         case "forme":
             posts_doc = await posts.where('author', '!=', callerID).get()
             break;
@@ -37,7 +40,7 @@ async function getPosts(data) {
     }
 
     if(!posts_doc.empty){
-        if(category !== "singleUser" && category !== "random"){
+        if(category !== "singleUser" && category !== "random" && category !== "all"){
 
             const posts = posts_doc.docs.map((doc)=>({
                 post:{
@@ -158,7 +161,6 @@ async function insertPost(data) {
 // DELETE POST
 // ====================================================================
 async function deletePost(postID) {
-    console.log(postID);
     const query = await db.collection('posts').doc(postID).delete()
 }
 

@@ -34,7 +34,6 @@ async function updateEquation(keyword, points) {
             eq.push({key: kw, points:points})
         }
         await AsyncStorage.setItem('equation', JSON.stringify(eq))
-        console.log(eq);
 
     }catch(err) {
         console.log(err);

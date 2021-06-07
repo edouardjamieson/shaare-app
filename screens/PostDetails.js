@@ -79,6 +79,9 @@ export default function PostDetails({route, navigation}) {
                 setActionSheetVisible(false)
                 navigation.navigate('Report', {type:'post', content:post})
                 break;
+            case 'exit':
+                setActionSheetVisible(false)
+                break;
             default:
                 setActionSheetVisible(false)
                 break;
@@ -196,9 +199,6 @@ export default function PostDetails({route, navigation}) {
 
     return(
             <SafeAreaView style={styles.container}>
-                <TouchableOpacity style={styles.exit} onPress={()=>{ navigation.goBack() }}>
-                    <Image source={require('./../assets/images/icons/exit.png')} style={styles.exit_icon} />
-                </TouchableOpacity>
                 {/* header */}
 
                 <View style={styles.header}>

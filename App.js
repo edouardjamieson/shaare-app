@@ -52,6 +52,17 @@ export default function App() {
         headerTitleStyle:{ fontFamily:DefaultTheme.fonts.bold },
         headerBackTitleVisible:false
       }
+      const subPageOptions = {
+        headerShown:true,
+        headerTitle:"",
+        headerBackTitle:'Back',
+        headerBackTitleStyle:{
+          color:DefaultTheme.colors.whites.full,
+          fontFamily:DefaultTheme.fonts.bold,
+          marginLeft:8
+        },
+        headerTintColor:DefaultTheme.colors.primary
+      }
       return (
           <NavigationContainer theme={{
             dark:true,
@@ -67,20 +78,10 @@ export default function App() {
   
             <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home" mode="cards">
               <Stack.Screen screenOptions={{gestureEnabled: false}} name="Home" component={Tabs} />
-              <Stack.Screen name="PostDetails" component={PostDetails}/>
+              <Stack.Screen name="PostDetails" component={PostDetails} options={subPageOptions}/>
               <Stack.Screen name="Shaare" component={Shaare}/>
               {/* Profile Screens */}
-              <Stack.Screen name="ProfileOther" component={ProfileOther} options={{
-                headerShown:true,
-                headerTitle:"",
-                headerBackTitle:'Back',
-                headerBackTitleStyle:{
-                  color:DefaultTheme.colors.whites.full,
-                  fontFamily:DefaultTheme.fonts.bold,
-                  marginLeft:8
-                },
-                headerTintColor:DefaultTheme.colors.primary
-              }}/>
+              <Stack.Screen name="ProfileOther" component={ProfileOther} options={subPageOptions}/>
               <Stack.Screen name="Bookmarked" component={Bookmarked} options={{
                 headerTitle:'Bookmarked 📒',
                 ...profilePageOptions

@@ -56,6 +56,10 @@ export default function ActionSheet({isVisible, uniqueContent, content, dispatch
                 </View>
                 <SpecialContent/>
                 <Actions/>
+                <TouchableOpacity style={[styles.action, {marginTop:16}]} onPress={()=>{dispatchAction('exit')}}>
+                    <Image source={require('./../../assets/images/icons/exit.png')} style={styles.action_icon} />
+                    <Text style={styles.action_title}>Close</Text>
+                </TouchableOpacity>
 
             </SafeAreaView>
             

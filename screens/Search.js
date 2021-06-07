@@ -15,7 +15,7 @@ export default function Search() {
         //clears timeout
         clearTimeout(searchTimer)
         //setTimers
-        searchTimer = setTimeout(()=>{ handleSearch(e) }, 500);
+        // searchTimer = setTimeout(()=>{ handleSearch(e) }, 500);
 
 
         setSearchString(e)
