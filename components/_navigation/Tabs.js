@@ -72,17 +72,6 @@ export default function Tabs() {
                 component={Profile}
                 options={{
                     tabBarIcon: ({focused})=>{
-                        // return <Image
-                        //     source={{uri:'https://thumbs-prod.si-cdn.com/0Hlhw9KPW6kA8-zuSeBrgg0ztfQ=/fit-in/1600x0/filters:focal(582x120:583x121)/https://public-media.si-cdn.com/filer/d6/7d/d67d186f-f5f3-4867-82c5-2c772120304f/thanos-snap-featured-120518-2.jpg'}}
-                        //     style={{
-                        //         width:30,
-                        //         height:30,
-                        //         resizeMode:"cover",
-                        //         borderColor:DefaultTheme.colors.primary,
-                        //         borderWidth: focused ? 2 : 0,
-                        //         borderRadius:100
-                        //     }}
-                        // />
                         return <Image
                             source={require('../../assets/images/icons/profile.png')}
                             style={[ styles.icon, {

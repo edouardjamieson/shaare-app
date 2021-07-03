@@ -164,8 +164,34 @@ async function deletePost(postID) {
     const query = await db.collection('posts').doc(postID).delete()
 }
 
+// ====================================================================
+// HANDLE SEARCH
+// ====================================================================
+async function searchPosts(entry) {
+    const search = entry.toLowerCase()
+    const users = await db.collection('users').get()
+    const query = await db.collection('posts').get()
+    if(!query.empty && entry.length > 0) {
+
+        //filter posts that match entry
+        const filtered = query.docs.filter(p => p.data().meta.content_title.toLowerCase().includes(search))
+        const posts = filtered.map((doc)=>({
+            post:{
+                id:doc.id,
+                data:doc.data()
+            },
+            user:{
+                id:doc.data().author,
+                data:users.docs.filter(u => u.id === doc.data().author)[0].data()
+            }
+        }))
+
+        return posts
+
+    }
+}
 
 
 
 
-export {getPosts, getSinglePost, reactToPost, insertPost, deletePost}
+export {getPosts, getSinglePost, reactToPost, insertPost, deletePost, searchPosts}

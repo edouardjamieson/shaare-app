@@ -1,30 +1,28 @@
 import React, { useState } from 'react'
-import { View, Text, Image, SafeAreaView, TextInput, StyleSheet } from 'react-native'
+import { View, Text, Image, SafeAreaView, TextInput, StyleSheet, FlatList } from 'react-native'
 
 import {globalStyles} from '../assets/styles/global.style'
 import { DefaultTheme } from '../theme/default'
 import Header from './../components/_header/Header'
-import {db} from './../firebase'
+import SinglePost from '../components/_posts/SinglePost'
 
-export default function Search() {
+import {searchPosts} from './../database/posts.db'
+
+export default function Search({navigation}) {
 
     const [searchString, setSearchString] = useState("")
+    const [results, setResults] = useState([])
 
-    let searchTimer
     const handleTyping = (e) => {
-        //clears timeout
-        clearTimeout(searchTimer)
-        //setTimers
-        // searchTimer = setTimeout(()=>{ handleSearch(e) }, 500);
-
+        if(e.length === 0){
+            setResults([])
+        }else{
+            searchPosts(e)
+            .then(data => setResults(data))
+        }
 
         setSearchString(e)
         
-    }
-    
-    const handleSearch = (e) => {
-        console.log(e);
-        console.log(searchTimer);
     }
 
     const EmptyString = () => {
@@ -36,13 +34,15 @@ export default function Search() {
         )
     }
 
-    const Results = () => {
-        return(
-
-            <Text>
-                yo
-            </Text>
-        )
+    // ====================================================================
+    // Renders single post
+    // ====================================================================
+    const renderPosts = ({item, index}) => {
+        return <SinglePost
+            post={item}
+            onTap={()=>{ navigation.navigate('PostDetails', { post:item }) }}
+            onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
+        />
     }
 
     return (
@@ -64,7 +64,15 @@ export default function Search() {
                     />
                 </View>
 
-                { searchString.length > 0 ? <Results/> : <EmptyString/> }
+                { results.length > 0 ?
+                <FlatList 
+                    data={results}
+                    renderItem={renderPosts}
+                    keyExtractor={item => item.post.id}
+                    showsVerticalScrollIndicator={false}
+                    horizontal={false}
+                    numColumns={2}
+                />: <EmptyString/> }
                         
             </View>
         </SafeAreaView>

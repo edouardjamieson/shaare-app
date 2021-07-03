@@ -6,19 +6,26 @@ import {globalStyles} from '../assets/styles/global.style'
 import { DefaultTheme } from '../theme/default'
 import Header from './../components/_header/Header'
 import ViewLoader from './../components/_loaders/ViewLoader'
+import SinglePost from './../components/_posts/SinglePost'
 
-import { getPopularKeywords } from './../database/keywords.db'
+import { getCachedUser } from './../database/users.db'
+import { getPosts } from './../database/posts.db'
 
-export default function Trending({navigation}) {
+export default function TrendingList({route, navigation}) {
 
-    const [keywords, setKeywords] = useState(null)
+    const keyword = route.params.keyword
+    const [posts, setPosts] = useState(null)
 
     useEffect(() => {
         
-        getPopularKeywords()
-        .then((keyword)=>{
-            setKeywords(keyword)
-        })
+        if(!posts){
+            getCachedUser().then(val => {
+                getPosts({category:'all', callerID:val.id})
+                .then((docs)=>{
+                    docs.length > 0 ? setPosts(docs) : setPosts("empty")
+                }) 
+            })
+        }
 
     }, [])
 
@@ -26,54 +33,48 @@ export default function Trending({navigation}) {
     // Handle refresh
     // ====================================================================
     const onRefresh = () => {
-        setKeywords(null)
-        getPopularKeywords()
-        .then((keyword)=>{
-            setKeywords(keyword)
-        })
+        // setKeywords(null)
+        // getPopularKeywords()
+        // .then((keyword)=>{
+        //     setKeywords(keyword)
+        // })
     }
 
     // ====================================================================
-    // Render keywords
+    // Renders single post
     // ====================================================================
-    const renderKeywords = ({item, index}) => {
-        return (
-        <TouchableOpacity onPress={()=>{ navigation.navigate('TrendingList', {keyword: item[0]}) }}>
-            <LinearGradient colors={DefaultTheme.colors.mainGradientArray} style={styles.keyword}>
-                <Text style={styles.keyword_count}>{item[1]}</Text>
-                <Text style={styles.keyword_title}>{item[0]}</Text>
-            </LinearGradient>
-        </TouchableOpacity>
-        )
+    const renderPosts = ({item, index}) => {
+        return <SinglePost
+            post={item}
+            onTap={()=>{ navigation.navigate('PostDetails', { post:item }) }}
+            onTapProfile={(id)=> {navigation.navigate('ProfileOther', {id:id})}}
+        />
     }
+
 
     return (
         <SafeAreaView style={globalStyles.safeArea}>
             <View style={globalStyles.page, {flex:1}}>
-                <Header isShaareButtonVisible={true} onPressShaare={()=>{ navigation.navigate('Shaare') }}/>
-                <View style={styles.content}>
-
-                    <Text style={styles.title}>Trending keywords</Text>
-                    {keywords ?
-                    <FlatList
-                        data={keywords}
-                        renderItem={renderKeywords}
-                        keyExtractor={item => item[0]}
-                        showsVerticalScrollIndicator={false}
-                        horizontal={false}
-                        numColumns={2}
-                        style={{flex:1}}
-                        refreshControl={
-                            <RefreshControl
-                            onRefresh={onRefresh}
-                            tintColor={"#fff"}
-                            colors={["#fff"]}
-                            />
-                        }
-                    />:<ViewLoader/>}
+                <Text style={styles.title}>{keyword}</Text>
+                {posts ?
+                <FlatList 
+                    data={posts}
+                    renderItem={renderPosts}
+                    keyExtractor={item => item.post.id}
+                    showsVerticalScrollIndicator={false}
+                    horizontal={false}
+                    numColumns={2}
+                    refreshControl={
+                        <RefreshControl
+                        onRefresh={onRefresh}
+                        tintColor={"#fff"}
+                        colors={["#fff"]}
+                        />
+                    }
+                />:<ViewLoader/>}
+                    
 
 
-                </View>
                 
                         
             </View>
@@ -91,7 +92,8 @@ const styles = StyleSheet.create({
         fontFamily:DefaultTheme.fonts.bold,
         color:DefaultTheme.colors.whites.full,
         fontSize:DefaultTheme.fontSizes.big,
-        marginBottom:8
+        marginBottom:8,
+        marginLeft:16
     },
 
     keyword: {

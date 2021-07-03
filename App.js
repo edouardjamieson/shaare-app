@@ -16,6 +16,7 @@ import Login from './screens/Login'
 import Logout from './screens/Logout'
 import PostDetails from './screens/PostDetails'
 import Shaare from './screens/Shaare'
+import TrendingList from './screens/Trending-list'
 import ProfileOther from './screens/Profile/Profile.other'
 import Bookmarked from './screens/Profile/Profile.bookmarked'
 import EditProfile from './screens/Profile/Profile.edit'
@@ -79,6 +80,7 @@ export default function App() {
             <Stack.Navigator screenOptions={{ headerShown:false }} initialRouteName="Home" mode="cards">
               <Stack.Screen screenOptions={{gestureEnabled: false}} name="Home" component={Tabs} />
               <Stack.Screen name="PostDetails" component={PostDetails} options={subPageOptions}/>
+              <Stack.Screen name="TrendingList" component={TrendingList} options={subPageOptions}/>
               <Stack.Screen name="Shaare" component={Shaare}/>
               {/* Profile Screens */}
               <Stack.Screen name="ProfileOther" component={ProfileOther} options={subPageOptions}/>
